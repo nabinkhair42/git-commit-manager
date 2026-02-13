@@ -1,0 +1,72 @@
+export interface CommitInfo {
+  hash: string;
+  abbreviatedHash: string;
+  message: string;
+  body: string;
+  authorName: string;
+  authorEmail: string;
+  date: string;
+  refs: string;
+  parentHashes: string[];
+}
+
+export interface CommitDetail extends CommitInfo {
+  diff: string;
+  stats: {
+    changed: number;
+    insertions: number;
+    deletions: number;
+  };
+  files: FileChange[];
+}
+
+export interface FileChange {
+  file: string;
+  changes: number;
+  insertions: number;
+  deletions: number;
+  binary: boolean;
+  status: "A" | "M" | "D" | "R" | "C" | "U";
+}
+
+export interface BranchInfo {
+  name: string;
+  current: boolean;
+  commit: string;
+  label: string;
+  linkedWorkTree: boolean;
+}
+
+export interface RepoInfo {
+  path: string;
+  currentBranch: string;
+  remotes: { name: string; refs: { fetch: string; push: string } }[];
+  isClean: boolean;
+  headCommit: string;
+}
+
+export interface StatusInfo {
+  current: string | null;
+  tracking: string | null;
+  ahead: number;
+  behind: number;
+  staged: string[];
+  modified: string[];
+  deleted: string[];
+  untracked: string[];
+  conflicted: string[];
+  isClean: boolean;
+}
+
+export interface DiffResult {
+  diff: string;
+  from: string;
+  to: string;
+}
+
+export type ResetMode = "soft" | "mixed" | "hard";
+
+export interface OperationResult {
+  success: boolean;
+  message: string;
+}
