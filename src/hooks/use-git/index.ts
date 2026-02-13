@@ -66,6 +66,22 @@ export function useDiff(from: string | null, to: string | null) {
   );
 }
 
+export function useStashList() {
+  const path = useRepoPath();
+  return useSWR(
+    path ? ["stash", path] : null,
+    () => gitService.getStashList(path!)
+  );
+}
+
+export function useTags() {
+  const path = useRepoPath();
+  return useSWR(
+    path ? ["tags", path] : null,
+    () => gitService.getTags(path!)
+  );
+}
+
 export function useGitMutations() {
   const path = useRepoPath();
 
@@ -124,6 +140,57 @@ export function useGitMutations() {
     async mergeBranch(source: string) {
       if (!path) throw new Error("No repo path");
       const result = await gitService.mergeBranch(path, source);
+      if (result.success) await invalidateAll();
+      return result;
+    },
+
+    // Stash
+    async stashSave(message?: string, includeUntracked?: boolean) {
+      if (!path) throw new Error("No repo path");
+      const result = await gitService.stashSave(path, message, includeUntracked);
+      if (result.success) await invalidateAll();
+      return result;
+    },
+
+    async stashApply(index: number) {
+      if (!path) throw new Error("No repo path");
+      const result = await gitService.stashApply(path, index);
+      if (result.success) await invalidateAll();
+      return result;
+    },
+
+    async stashPop(index: number) {
+      if (!path) throw new Error("No repo path");
+      const result = await gitService.stashPop(path, index);
+      if (result.success) await invalidateAll();
+      return result;
+    },
+
+    async stashDrop(index: number) {
+      if (!path) throw new Error("No repo path");
+      const result = await gitService.stashDrop(path, index);
+      if (result.success) await invalidateAll();
+      return result;
+    },
+
+    async stashClear() {
+      if (!path) throw new Error("No repo path");
+      const result = await gitService.stashClear(path);
+      if (result.success) await invalidateAll();
+      return result;
+    },
+
+    // Tags
+    async createTag(name: string, message?: string, hash?: string) {
+      if (!path) throw new Error("No repo path");
+      const result = await gitService.createTag(path, name, message, hash);
+      if (result.success) await invalidateAll();
+      return result;
+    },
+
+    async deleteTag(name: string) {
+      if (!path) throw new Error("No repo path");
+      const result = await gitService.deleteTag(path, name);
       if (result.success) await invalidateAll();
       return result;
     },

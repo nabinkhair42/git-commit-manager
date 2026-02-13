@@ -10,6 +10,7 @@ import {
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
+  Copy,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useCommits, useGitMutations, useBranches } from "@/hooks/use-git";
@@ -36,6 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { CommitListSkeleton } from "@/components/loaders/commit-list-skeleton";
 import { ConfirmationDialog } from "@/components/shared/confirmation-dialog";
 import type { ResetMode } from "@/lib/git/types";
@@ -222,9 +224,24 @@ export function CommitList() {
                   i !== 0 ? "border-t border-dashed border-border" : ""
                 }`}
               >
-                <code className="mt-0.5 shrink-0 font-mono text-xs text-muted-foreground">
-                  {commit.abbreviatedHash}
-                </code>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(commit.hash);
+                        toast.success("Hash copied");
+                      }}
+                      className="mt-0.5 flex shrink-0 items-center gap-1 rounded px-1 py-0.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
+                    >
+                      {commit.abbreviatedHash}
+                      <Copy size={10} className="opacity-0 transition-opacity group-hover:opacity-60" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" className="text-xs">
+                    Click to copy full hash
+                  </TooltipContent>
+                </Tooltip>
 
                 <div className="min-w-0 flex-1">
                   <Link

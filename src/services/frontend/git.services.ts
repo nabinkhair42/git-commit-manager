@@ -9,6 +9,8 @@ import type {
   DiffResult,
   OperationResult,
   ResetMode,
+  StashEntry,
+  TagInfo,
 } from "@/lib/git/types";
 
 function unwrap<T>(res: { data: { success: boolean; data: T } }): T {
@@ -124,5 +126,61 @@ export interface DirSuggestion {
 export async function browsePath(partial: string) {
   return unwrap<{ suggestions: DirSuggestion[] }>(
     await api.get(API_ENDPOINTS.BROWSE, { params: { path: partial } })
+  );
+}
+
+// Stash
+export async function getStashList(path: string) {
+  return unwrap<{ stashes: StashEntry[] }>(
+    await api.get(API_ENDPOINTS.STASH, { params: { path } })
+  );
+}
+
+export async function stashSave(path: string, message?: string, includeUntracked?: boolean) {
+  return unwrap<OperationResult>(
+    await api.post(API_ENDPOINTS.STASH, { path, action: "save", message, includeUntracked })
+  );
+}
+
+export async function stashApply(path: string, index: number) {
+  return unwrap<OperationResult>(
+    await api.post(API_ENDPOINTS.STASH, { path, action: "apply", index })
+  );
+}
+
+export async function stashPop(path: string, index: number) {
+  return unwrap<OperationResult>(
+    await api.post(API_ENDPOINTS.STASH, { path, action: "pop", index })
+  );
+}
+
+export async function stashDrop(path: string, index: number) {
+  return unwrap<OperationResult>(
+    await api.post(API_ENDPOINTS.STASH, { path, action: "drop", index })
+  );
+}
+
+export async function stashClear(path: string) {
+  return unwrap<OperationResult>(
+    await api.post(API_ENDPOINTS.STASH, { path, action: "clear" })
+  );
+}
+
+// Tags
+export async function getTags(path: string) {
+  return unwrap<{ tags: TagInfo[] }>(
+    await api.get(API_ENDPOINTS.TAGS, { params: { path } })
+  );
+}
+
+export async function createTag(path: string, name: string, message?: string, hash?: string) {
+  return unwrap<OperationResult>(
+    await api.post(API_ENDPOINTS.TAGS, { path, name, message, hash })
+  );
+}
+
+export async function deleteTag(path: string, name: string) {
+  return unwrap<OperationResult>(
+    await api.delete(API_ENDPOINTS.TAGS, { data: { path, name } })
   );
 }

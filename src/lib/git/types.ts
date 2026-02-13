@@ -71,3 +71,19 @@ export interface OperationResult {
   success: boolean;
   message: string;
 }
+
+export interface StashEntry {
+  index: number;
+  message: string;
+  date: string;
+  hash: string;
+}
+
+export interface TagInfo {
+  name: string;
+  hash: string;
+  message: string;
+  date: string;
+  tagger: string;
+  isAnnotated: boolean;
+}

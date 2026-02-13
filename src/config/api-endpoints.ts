@@ -20,6 +20,12 @@ export const API_ENDPOINTS = {
   BRANCHES_CHECKOUT: "/git/branches/checkout",
   BRANCHES_MERGE: "/git/branches/merge",
 
+  // Tags
+  TAGS: "/git/tags",
+
+  // Stash
+  STASH: "/git/stash",
+
   // Status
   STATUS: "/git/status",
 

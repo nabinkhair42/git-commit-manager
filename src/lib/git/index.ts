@@ -4,4 +4,6 @@ export { getBranches, createBranch, deleteBranch, checkoutBranch, mergeBranch } 
 export { getDiff } from "./diff";
 export { resetToCommit, cherryPickCommit, revertCommit } from "./operations";
 export { getStatus } from "./status";
+export { getStashList, stashSave, stashApply, stashPop, stashDrop, stashClear } from "./stash";
+export { getTags, createTag, deleteTag } from "./tags";
 export type * from "./types";

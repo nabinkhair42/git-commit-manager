@@ -58,11 +58,20 @@ export function BranchList() {
   }>({ open: false, name: "", force: false });
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const [search, setSearch] = useState("");
+
   const allBranches = data?.branches || [];
-  const localBranches = allBranches.filter((b) => !b.isRemote);
-  const remoteBranches = allBranches.filter((b) => b.isRemote);
-  const branches = allBranches;
-  const currentBranch = localBranches.find((b) => b.current);
+
+  const filteredBranches = search
+    ? allBranches.filter((b) =>
+        b.name.toLowerCase().includes(search.toLowerCase())
+      )
+    : allBranches;
+
+  const localBranches = filteredBranches.filter((b) => !b.isRemote);
+  const remoteBranches = filteredBranches.filter((b) => b.isRemote);
+  const branches = filteredBranches;
+  const currentBranch = allBranches.filter((b) => !b.isRemote).find((b) => b.current);
 
   async function handleCreate() {
     if (!newBranchName.trim()) return;
@@ -176,6 +185,18 @@ export function BranchList() {
             </Button>
           </div>
         </div>
+
+        {/* Search */}
+        {allBranches.length > 5 && (
+          <div className="pb-4">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Filter branches..."
+              className="h-9 max-w-xs border-border bg-white/[0.03] text-sm placeholder:text-muted-foreground/50 focus:border-primary/40 focus:ring-1 focus:ring-primary/20"
+            />
+          </div>
+        )}
       </div>
 
       <div className="section-divider" aria-hidden="true" />
