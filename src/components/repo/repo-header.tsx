@@ -60,38 +60,38 @@ export function RepoHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-3">
-        <div className="flex items-center gap-3">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-initial sm:gap-3">
           <Link
             href={isGitHub ? "/?mode=github" : "/"}
-            className="flex items-center gap-2 text-foreground transition-colors hover:text-foreground/80"
+            className="flex min-w-0 items-center gap-2 text-foreground transition-colors hover:text-foreground/80"
           >
-            <GitManagerAppIcon className="size-5" />
-            <span className="font-semibold tracking-tight">{displayName}</span>
+            <GitManagerAppIcon className="size-4 shrink-0 sm:size-5" />
+            <span className="truncate font-semibold tracking-tight text-sm sm:text-base">{displayName}</span>
           </Link>
 
           {isGitHub && (
-            <Badge variant="outline" className="gap-1.5 border-git-info/30 text-git-info text-[10px]">
+            <Badge variant="outline" className="hidden gap-1.5 border-git-info/30 text-[10px] text-git-info sm:flex">
               GitHub
             </Badge>
           )}
 
           {!isGitHub && repoInfo && (
-            <Badge variant="secondary" className="gap-1.5 font-mono text-xs">
+            <Badge variant="secondary" className="hidden gap-1.5 font-mono text-xs sm:flex">
               <GitBranch size={12} />
               {repoInfo.currentBranch}
             </Badge>
           )}
 
           {!isGitHub && status && !status.isClean && (
-            <Badge variant="outline" className="gap-1.5 border-git-warning/30 text-git-warning">
+            <Badge variant="outline" className="hidden gap-1.5 border-git-warning/30 text-git-warning sm:flex">
               <CircleDot size={10} />
               Uncommitted
             </Badge>
           )}
         </div>
 
-        <nav className="flex items-center gap-1 text-sm">
+        <nav className="flex items-center gap-0.5 text-sm sm:gap-1">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
@@ -99,14 +99,14 @@ export function RepoHeader() {
                 <TooltipTrigger asChild>
                   <Link
                     href={buildHref(item.href)}
-                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-colors ${
+                    className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition-colors sm:px-3 ${
                       active
                         ? "bg-accent text-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <item.icon size={14} />
-                    {item.label}
+                    <item.icon className="size-3.5 sm:size-4" />
+                    <span className="hidden sm:inline">{item.label}</span>
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="text-xs">

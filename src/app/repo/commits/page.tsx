@@ -7,7 +7,7 @@ import { CommitListSkeleton } from "@/components/loaders/commit-list-skeleton";
 export default function CommitsPage() {
   return (
     <section>
-      <div className="rail-bounded px-6">
+      <div className="rail-bounded px-4 sm:px-6">
         <div className="pb-2 pt-8">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             History

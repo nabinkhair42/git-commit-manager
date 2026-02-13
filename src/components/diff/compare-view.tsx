@@ -28,7 +28,7 @@ export function CompareView() {
   return (
     <>
       {/* Selectors */}
-      <div className="rail-bounded px-6">
+      <div className="rail-bounded px-4 sm:px-6">
         <div className="pb-6 pt-8">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Diff
@@ -78,7 +78,7 @@ export function CompareView() {
           </div>
 
           <Select value={viewFormat} onValueChange={(v) => setViewFormat(v as typeof viewFormat)}>
-            <SelectTrigger className="h-9 w-auto min-w-[120px] border-border bg-input/20 text-sm">
+            <SelectTrigger className="h-9 w-full border-border bg-input/20 text-sm sm:w-auto sm:min-w-30">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

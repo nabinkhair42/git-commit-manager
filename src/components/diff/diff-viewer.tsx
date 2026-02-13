@@ -30,7 +30,7 @@ export function DiffViewer({ diff, outputFormat = "line-by-line" }: DiffViewerPr
 
   return (
     <div
-      className="overflow-x-auto font-mono text-xs"
+      className="overflow-x-auto font-mono text-[11px] sm:text-xs"
       dangerouslySetInnerHTML={{ __html: rendered }}
     />
   );

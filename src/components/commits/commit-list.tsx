@@ -191,7 +191,7 @@ export function CommitList() {
               value={branch || "__all__"}
               onValueChange={(v) => { setBranch(v === "__all__" ? undefined : v); setPage(0); }}
             >
-              <SelectTrigger className="h-9 w-auto min-w-[140px] border-border bg-input/20 text-sm">
+              <SelectTrigger className="h-9 w-full border-border bg-input/20 text-sm sm:w-auto sm:min-w-35">
                 <SelectValue placeholder="All branches" />
               </SelectTrigger>
               <SelectContent>
@@ -222,7 +222,7 @@ export function CommitList() {
             {data?.commits.map((commit, i) => (
               <div
                 key={commit.hash}
-                className={`group flex items-start gap-4 px-6 py-4 transition-colors hover:bg-muted ${
+                className={`group flex flex-col gap-3 px-4 py-4 transition-colors hover:bg-muted sm:flex-row sm:items-start sm:gap-4 sm:px-6 ${
                   i !== 0 ? "border-t border-dashed border-border" : ""
                 }`}
               >

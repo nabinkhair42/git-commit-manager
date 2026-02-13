@@ -165,15 +165,15 @@ export function BranchList() {
   return (
     <>
       {/* Header with actions */}
-      <div className="rail-bounded px-6">
-        <div className="flex items-end justify-between pb-4 pt-8">
+      <div className="rail-bounded px-4 sm:px-6">
+        <div className="flex flex-col gap-4 pb-4 pt-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Management
             </p>
             <h2 className="mt-2 text-2xl font-bold tracking-tight">Branches</h2>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {!isGitHub && (
               <>
                 <Button
@@ -205,7 +205,7 @@ export function BranchList() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter branches..."
-              className="h-9 max-w-xs border-border bg-input/20 text-sm placeholder:text-muted-foreground/50 focus:border-primary/40 focus:ring-1 focus:ring-primary/20"
+              className="h-9 w-full border-border bg-input/20 text-sm placeholder:text-muted-foreground/50 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 sm:max-w-xs"
             />
           </div>
         )}
@@ -225,7 +225,7 @@ export function BranchList() {
           <div>
             {/* Local branches */}
             {localBranches.length > 0 && (
-              <div className="px-6 pb-1 pt-4">
+              <div className="px-4 pb-1 pt-4 sm:px-6">
                 <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60">
                   Local
                 </p>
@@ -234,7 +234,7 @@ export function BranchList() {
             {localBranches.map((branch, i) => (
               <div
                 key={branch.name}
-                className={`group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-muted ${
+                className={`group flex flex-col gap-3 px-4 py-4 transition-colors hover:bg-muted sm:flex-row sm:items-center sm:gap-4 sm:px-6 ${
                   i !== 0 ? "border-t border-dashed border-border" : ""
                 }`}
               >

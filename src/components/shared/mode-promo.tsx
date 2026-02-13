@@ -72,7 +72,7 @@ export function ModePromo() {
     resolvedTheme === "dark" ? config.images.dark : config.images.light;
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 w-[340px] animate-in slide-in-from-bottom-4 fade-in duration-300">
+    <div className="fixed bottom-3 right-3 z-50 w-[calc(100vw-24px)] max-w-[340px] animate-in slide-in-from-bottom-4 fade-in duration-300 sm:bottom-5 sm:right-5">
       <div className="overflow-hidden rounded-xl border border-border bg-background shadow-lg">
         {/* Screenshot preview */}
         <div className="relative border-b border-border">

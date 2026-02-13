@@ -38,8 +38,8 @@ export function RepoSelector() {
   return (
     <div className="page-rails flex min-h-screen flex-col">
       {/* Hero */}
-      <section className="relative pt-24 sm:pt-32">
-        <div className="mx-auto w-full max-w-6xl px-6 text-center">
+      <section className="relative pt-16 sm:pt-24 lg:pt-32">
+        <div className="mx-auto w-full max-w-6xl px-4 text-center sm:px-6">
           <div className="pb-8">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5">
               <span className="size-1.5 animate-pulse rounded-full bg-foreground/40" />
@@ -48,10 +48,10 @@ export function RepoSelector() {
               </span>
             </div>
 
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
               Git Commit Manager
             </h1>
-            <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-muted-foreground">
+            <p className="mx-auto mt-4 max-w-md px-4 text-sm leading-relaxed text-muted-foreground sm:px-0 sm:text-base">
               {mode === "github"
                 ? "Browse your GitHub repositories — commits, branches, tags, and diffs."
                 : "Open any local repository to view history, manage branches, compare diffs, and perform git operations."}
@@ -60,30 +60,30 @@ export function RepoSelector() {
 
           {/* Mode switch tabs */}
           {!isProduction ? (
-            <div className="mx-auto mb-8 flex max-w-xs items-center rounded-lg border border-border bg-muted/50 p-1">
+            <div className="mx-auto mb-8 flex w-full max-w-xs items-center rounded-lg border border-border bg-muted/50 p-1">
               <button
                 type="button"
                 onClick={() => setMode("local")}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition-all sm:gap-2 sm:px-4 sm:text-sm ${
                   mode === "local"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <FolderGit2 size={14} />
-                Local
+                <FolderGit2 className="size-3.5 sm:size-4" />
+                <span>Local</span>
               </button>
               <button
                 type="button"
                 onClick={() => setMode("github")}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition-all sm:gap-2 sm:px-4 sm:text-sm ${
                   mode === "github"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <GitHub className="size-4" />
-                GitHub
+                <GitHub className="size-3.5 sm:size-4" />
+                <span>GitHub</span>
               </button>
             </div>
           ) : null}
@@ -134,7 +134,7 @@ function LocalModeContent() {
 
   return (
     <>
-      <div className="mx-auto mt-4 flex max-w-lg items-center gap-2">
+      <div className="mx-auto mt-4 flex w-full max-w-lg flex-col gap-2 px-4 sm:flex-row sm:items-center sm:px-0">
         <PathInput
           value={path}
           onChange={setPath}
@@ -148,14 +148,14 @@ function LocalModeContent() {
           onClick={() => openRepo(path)}
           disabled={!path.trim()}
           isLoading={loading}
-          className="h-11 shrink-0 bg-foreground px-5 text-sm font-medium text-background transition-opacity hover:opacity-80"
+          className="h-11 w-full shrink-0 bg-foreground px-5 text-sm font-medium text-background transition-opacity hover:opacity-80 sm:w-auto"
         >
           Open
           <ArrowRight size={16} className="ml-1" />
         </Button>
       </div>
 
-      <p className="mx-auto mt-3 max-w-md text-xs text-muted-foreground/60">
+      <p className="mx-auto mt-3 max-w-md px-4 text-xs text-muted-foreground/60 sm:px-0">
         Type a path to see autocomplete suggestions. Git repos are highlighted
         in green.
       </p>
@@ -176,16 +176,16 @@ function RecentRepos({
 
   return (
     <div className="rail-bounded border-t border-border">
-      <div className="px-6 pb-4 pt-8">
+      <div className="px-4 pb-4 pt-8 sm:px-6">
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Recent Repositories
         </p>
       </div>
-      <div className="grid sm:grid-cols-2">
+      <div className="grid gap-0 sm:grid-cols-2">
         {repos.map((repo, i) => (
           <div
             key={repo}
-            className={`group flex cursor-pointer items-center gap-3 px-6 py-4 transition-colors hover:bg-muted
+            className={`group flex cursor-pointer items-center gap-3 px-4 py-4 transition-colors hover:bg-muted sm:px-6
               ${i % 2 !== 0 ? "sm:border-l sm:border-dashed sm:border-border" : ""}
               ${i >= 2 ? "sm:border-t sm:border-dashed sm:border-border" : ""}
               ${i >= 1 ? "max-sm:border-t max-sm:border-dashed max-sm:border-border" : ""}
@@ -193,8 +193,7 @@ function RecentRepos({
             onClick={() => openRepo(repo)}
           >
             <FolderGit2
-              size={16}
-              className="shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
+              className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
             />
             <span className="min-w-0 flex-1 truncate text-left font-mono text-sm text-foreground">
               {repo}
