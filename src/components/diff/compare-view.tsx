@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DiffSkeleton } from "@/components/loaders/diff-skeleton";
 import { DiffViewer } from "@/components/diff/diff-viewer";
 
 export function CompareView() {
@@ -100,10 +100,7 @@ export function CompareView() {
             </p>
           </div>
         ) : diffLoading ? (
-          <div className="space-y-4 px-6 py-8">
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-64 w-full" />
-          </div>
+          <DiffSkeleton />
         ) : diffData ? (
           <div className="overflow-x-auto px-6 py-6">
             <DiffViewer diff={diffData.diff} outputFormat={viewFormat} />

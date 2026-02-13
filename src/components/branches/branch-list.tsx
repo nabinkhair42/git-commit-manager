@@ -432,10 +432,11 @@ export function BranchList() {
             </Button>
             <Button
               onClick={handleCreate}
-              disabled={!newBranchName.trim() || createLoading}
+              disabled={!newBranchName.trim()}
+              isLoading={createLoading}
               className="bg-foreground text-background transition-opacity hover:opacity-80"
             >
-              {createLoading ? "Creating..." : "Create"}
+              Create
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -479,10 +480,11 @@ export function BranchList() {
             </Button>
             <Button
               onClick={handleMerge}
-              disabled={!mergeSource || mergeLoading}
+              disabled={!mergeSource}
+              isLoading={mergeLoading}
               className="bg-foreground text-background transition-opacity hover:opacity-80"
             >
-              {mergeLoading ? "Merging..." : "Merge"}
+              Merge
             </Button>
           </DialogFooter>
         </DialogContent>

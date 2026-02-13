@@ -138,11 +138,12 @@ function LocalModeContent() {
         <Button
           type="button"
           onClick={() => openRepo(path)}
-          disabled={loading || !path.trim()}
+          disabled={!path.trim()}
+          isLoading={loading}
           className="h-11 shrink-0 bg-foreground px-5 text-sm font-medium text-background transition-opacity hover:opacity-80"
         >
-          {loading ? "Validating..." : "Open"}
-          {!loading && <ArrowRight size={16} className="ml-1" />}
+          Open
+          <ArrowRight size={16} className="ml-1" />
         </Button>
       </div>
 

@@ -30,7 +30,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TagListSkeleton } from "@/components/loaders/tag-list-skeleton";
 import { ConfirmationDialog } from "@/components/shared/confirmation-dialog";
 
 export function TagList() {
@@ -152,22 +152,7 @@ export function TagList() {
       {/* Tag list */}
       <div className="rail-bounded border-t border-border">
         {isLoading ? (
-          <div className="space-y-0">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className={`flex items-center gap-4 px-6 py-4 ${
-                  i !== 0 ? "border-t border-dashed border-border" : ""
-                }`}
-              >
-                <Skeleton className="size-5 rounded" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-1/3" />
-                  <Skeleton className="h-3 w-1/5" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <TagListSkeleton />
         ) : filteredTags.length === 0 ? (
           <div className="flex items-center justify-center py-20">
             <p className="text-sm text-muted-foreground">
@@ -323,10 +308,11 @@ export function TagList() {
             </Button>
             <Button
               onClick={handleCreate}
-              disabled={!tagName.trim() || createLoading}
+              disabled={!tagName.trim()}
+              isLoading={createLoading}
               className="bg-foreground text-background transition-opacity hover:opacity-80"
             >
-              {createLoading ? "Creating..." : "Create"}
+              Create
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -8,7 +8,7 @@ import { formatDate, formatHash, formatDiffStats } from "@/lib/formatters";
 import { FILE_STATUS_LABELS, FILE_STATUS_COLORS } from "@/config/constants";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CommitDetailSkeleton } from "@/components/loaders/commit-detail-skeleton";
 import { DiffViewer } from "@/components/diff/diff-viewer";
 
 interface CommitDetailProps {
@@ -22,15 +22,7 @@ export function CommitDetail({ hash }: CommitDetailProps) {
   const router = useRouter();
 
   if (isLoading) {
-    return (
-      <div className="rail-bounded">
-        <div className="space-y-6 px-6 py-8">
-          <Skeleton className="h-6 w-64" />
-          <Skeleton className="h-4 w-48" />
-          <Skeleton className="h-64 w-full" />
-        </div>
-      </div>
-    );
+    return <CommitDetailSkeleton />;
   }
 
   if (error || !commit) {

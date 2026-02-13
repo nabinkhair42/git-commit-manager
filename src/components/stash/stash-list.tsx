@@ -29,7 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
+import { StashListSkeleton } from "@/components/loaders/stash-list-skeleton";
 import { ConfirmationDialog } from "@/components/shared/confirmation-dialog";
 
 export function StashList() {
@@ -181,22 +181,7 @@ export function StashList() {
       {/* Stash list */}
       <div className="rail-bounded border-t border-border">
         {isLoading ? (
-          <div className="space-y-0">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className={`flex items-center gap-4 px-6 py-4 ${
-                  i !== 0 ? "border-t border-dashed border-border" : ""
-                }`}
-              >
-                <Skeleton className="size-5 rounded" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-3 w-1/4" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <StashListSkeleton />
         ) : stashes.length === 0 ? (
           <div className="flex items-center justify-center py-20">
             <p className="text-sm text-muted-foreground">No stashes</p>
@@ -316,10 +301,10 @@ export function StashList() {
             </Button>
             <Button
               onClick={handleSave}
-              disabled={saveLoading}
+              isLoading={saveLoading}
               className="bg-foreground text-background transition-opacity hover:opacity-80"
             >
-              {saveLoading ? "Stashing..." : "Stash"}
+              Stash
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -12,6 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -77,17 +77,18 @@ export function ConfirmationDialog({
           <AlertDialogCancel className="border-white/[0.1] transition-colors hover:bg-white/[0.04]">
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction
+          <Button
             onClick={handleConfirm}
-            disabled={!canConfirm || loading}
+            disabled={!canConfirm}
+            isLoading={loading}
             className={
               variant === "destructive"
                 ? "bg-destructive text-white hover:bg-destructive/90"
                 : "bg-foreground text-background transition-opacity hover:opacity-80"
             }
           >
-            {loading ? "Processing..." : confirmLabel}
-          </AlertDialogAction>
+            {confirmLabel}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
