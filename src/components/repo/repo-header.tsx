@@ -1,17 +1,18 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { GitBranch, GitCommitHorizontal, GitCompareArrows, FolderGit2, Github, CircleDot, Archive, Tag } from "lucide-react";
-import { useRepoInfo, useStatus } from "@/hooks/use-git";
-import { useRepoShortcuts } from "@/hooks/use-keyboard-shortcuts";
-import { useRepo } from "@/hooks/use-repo";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useRepoInfo, useStatus } from "@/hooks/use-git";
+import { useRepoShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { useRepo } from "@/hooks/use-repo";
+import { Archive, CircleDot, GitBranch, GitCommitHorizontal, GitCompareArrows, Tag } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { GitManagerAppIcon } from "../icons/git-manager";
 
 const localNavItems = [
   { label: "Commits", href: "/repo/commits", icon: GitCommitHorizontal, shortcut: "1" },
@@ -66,17 +67,7 @@ export function RepoHeader() {
             className="flex items-center gap-2 text-foreground transition-colors hover:text-foreground/80"
           >
             {/* Inline logo */}
-            <svg viewBox="0 0 32 32" fill="none" className="size-5" xmlns="http://www.w3.org/2000/svg">
-              <rect width="32" height="32" rx="6" className="fill-foreground" />
-              <g transform="translate(16,16)">
-                <line x1="0" y1="-8" x2="0" y2="8" className="stroke-background" strokeWidth="2.5" strokeLinecap="round" />
-                <line x1="0" y1="-1" x2="5.5" y2="-6" className="stroke-background" strokeWidth="2.5" strokeLinecap="round" />
-                <circle cx="0" cy="-8" r="2" className="fill-foreground stroke-background" strokeWidth="1.8" />
-                <circle cx="0" cy="-1" r="2" className="fill-foreground stroke-background" strokeWidth="1.8" />
-                <circle cx="0" cy="8" r="2" className="fill-background" />
-                <circle cx="5.5" cy="-6" r="2" className="fill-foreground stroke-background" strokeWidth="1.8" />
-              </g>
-            </svg>
+            <GitManagerAppIcon className="size-5" />
             <span className="font-semibold tracking-tight">{displayName}</span>
           </Link>
 

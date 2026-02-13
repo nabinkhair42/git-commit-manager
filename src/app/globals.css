@@ -177,27 +177,27 @@
 }
 
 .dot-pattern {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-image: radial-gradient(color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 /* Scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 10%, transparent) transparent;
 }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--foreground) 10%, transparent); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--foreground) 18%, transparent); }
 
-/* diff2html overrides for dark mode */
+/* diff2html overrides */
 .d2h-wrapper {
   --d2h-bg-color: transparent;
   --d2h-border-color: var(--border);
 }
 .d2h-file-header {
-  background: rgba(255, 255, 255, 0.03) !important;
+  background: color-mix(in srgb, var(--foreground) 3%, transparent) !important;
   border-color: var(--border) !important;
   color: var(--foreground) !important;
 }
@@ -227,7 +227,7 @@
   background: transparent !important;
 }
 .d2h-info {
-  background: rgba(255, 255, 255, 0.03) !important;
+  background: color-mix(in srgb, var(--foreground) 3%, transparent) !important;
   color: var(--muted-foreground) !important;
   border-color: var(--border) !important;
 }
@@ -242,21 +242,6 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 4rem;
 }
-
-/* diff2html light mode adjustments */
-:root .d2h-info {
-  background: rgba(0, 0, 0, 0.02) !important;
-}
-.dark .d2h-info {
-  background: rgba(255, 255, 255, 0.03) !important;
-}
-
-/* Light-mode scrollbar */
-:root {
-  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
-}
-:root ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); }
-:root ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
 
 @layer base {
   * {
