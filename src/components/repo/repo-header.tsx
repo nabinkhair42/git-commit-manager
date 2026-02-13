@@ -60,14 +60,14 @@ export function RepoHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-initial sm:gap-3">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Link
             href={isGitHub ? "/?mode=github" : "/"}
             className="flex min-w-0 items-center gap-2 text-foreground transition-colors hover:text-foreground/80"
           >
             <GitManagerAppIcon className="size-4 shrink-0 sm:size-5" />
-            <span className="truncate font-semibold tracking-tight text-sm sm:text-base">{displayName}</span>
+            <span className="max-w-[120px] truncate text-sm font-semibold tracking-tight sm:max-w-[200px] sm:text-base md:max-w-none">{displayName}</span>
           </Link>
 
           {isGitHub && (
@@ -91,7 +91,7 @@ export function RepoHeader() {
           )}
         </div>
 
-        <nav className="flex items-center gap-0.5 text-sm sm:gap-1">
+        <nav className="flex shrink-0 items-center gap-0.5 text-sm sm:gap-1">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (

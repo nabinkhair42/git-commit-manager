@@ -185,7 +185,7 @@ function RecentRepos({
         {repos.map((repo, i) => (
           <div
             key={repo}
-            className={`group flex cursor-pointer items-center gap-3 px-4 py-4 transition-colors hover:bg-muted sm:px-6
+            className={`group flex cursor-pointer items-start gap-3 px-4 py-4 transition-colors hover:bg-muted sm:items-center sm:px-6
               ${i % 2 !== 0 ? "sm:border-l sm:border-dashed sm:border-border" : ""}
               ${i >= 2 ? "sm:border-t sm:border-dashed sm:border-border" : ""}
               ${i >= 1 ? "max-sm:border-t max-sm:border-dashed max-sm:border-border" : ""}
@@ -193,9 +193,9 @@ function RecentRepos({
             onClick={() => openRepo(repo)}
           >
             <FolderGit2
-              className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
+              className="mt-0.5 size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground sm:mt-0"
             />
-            <span className="min-w-0 flex-1 truncate text-left font-mono text-sm text-foreground">
+            <span className="min-w-0 flex-1 break-all text-left font-mono text-sm text-foreground sm:truncate">
               {repo}
             </span>
             <button
@@ -323,19 +323,21 @@ function GitHubModeContent({
   return (
     <div className="mt-2">
       {/* User info bar */}
-      <div className="mx-auto mb-6 flex max-w-2xl items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-3">
+      <div className="mx-auto mb-6 flex max-w-2xl flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-4 py-2.5">
+        <div className="flex min-w-0 items-center gap-3">
           {session.user.image && (
             <img
               src={session.user.image}
               alt=""
-              className="h-7 w-7 rounded-full"
+              className="h-7 w-7 shrink-0 rounded-full"
             />
           )}
-          <span className="text-sm text-foreground">{session.user.name}</span>
-          <span className="text-xs text-muted-foreground">
-            {session.user.email}
-          </span>
+          <div className="min-w-0">
+            <span className="block truncate text-sm text-foreground">{session.user.name}</span>
+            <span className="block truncate text-xs text-muted-foreground">
+              {session.user.email}
+            </span>
+          </div>
         </div>
         <Button
           variant="ghost"

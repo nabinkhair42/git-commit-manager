@@ -122,8 +122,8 @@ export function GitHubRepoPicker() {
                 className="group flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-muted"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="truncate font-mono text-sm font-medium text-foreground">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span className="min-w-0 break-all font-mono text-sm font-medium text-foreground sm:truncate">
                       {repo.fullName}
                     </span>
                     {repo.isPrivate && (
@@ -139,7 +139,7 @@ export function GitHubRepoPicker() {
                     )}
                   </div>
                   {repo.description && (
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground sm:truncate">
                       {repo.description}
                     </p>
                   )}
@@ -159,7 +159,7 @@ export function GitHubRepoPicker() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                  className="hidden shrink-0 opacity-0 transition-opacity group-hover:opacity-100 sm:flex"
                 >
                   Open <ArrowRight className="ml-1 h-3 w-3" />
                 </Button>

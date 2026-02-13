@@ -1,11 +1,15 @@
-import { formatDistanceToNow, format } from "date-fns";
+import { formatDistanceToNow, format, isValid } from "date-fns";
 
 export function formatRelativeDate(date: string | Date): string {
-  return formatDistanceToNow(new Date(date), { addSuffix: true });
+  const d = new Date(date);
+  if (!isValid(d)) return "Unknown date";
+  return formatDistanceToNow(d, { addSuffix: true });
 }
 
 export function formatDate(date: string | Date): string {
-  return format(new Date(date), "MMM d, yyyy 'at' h:mm a");
+  const d = new Date(date);
+  if (!isValid(d)) return "Unknown date";
+  return format(d, "MMM d, yyyy 'at' h:mm a");
 }
 
 export function formatHash(hash: string): string {
