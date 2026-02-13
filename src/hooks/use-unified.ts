@@ -7,7 +7,7 @@
 
 import useSWR from "swr";
 import { useRepo } from "@/hooks/use-repo";
-import * as gitHooks from "@/hooks/use-git";
+import { useCommits, useCommitDetail, useBranches, useTags, useDiff } from "@/hooks/use-git";
 import * as ghService from "@/services/frontend/github.services";
 import type { CommitInfo, CommitDetail, BranchInfo, TagInfo, DiffResult } from "@/lib/git/types";
 
@@ -34,7 +34,7 @@ export function useUnifiedCommits(opts?: {
   const { owner, repo } = useGitHubParams();
 
   // Local
-  const local = gitHooks.useCommits(isGitHub ? undefined : opts);
+  const local = useCommits(isGitHub ? undefined : opts);
 
   // GitHub
   const github = useSWR(
@@ -71,7 +71,7 @@ export function useUnifiedCommitDetail(hash: string | null) {
   const isGitHub = useIsGitHub();
   const { owner, repo } = useGitHubParams();
 
-  const local = gitHooks.useCommitDetail(isGitHub ? null : hash);
+  const local = useCommitDetail(isGitHub ? null : hash);
 
   const github = useSWR(
     isGitHub && owner && repo && hash
@@ -101,7 +101,7 @@ export function useUnifiedBranches() {
   const isGitHub = useIsGitHub();
   const { owner, repo } = useGitHubParams();
 
-  const local = gitHooks.useBranches();
+  const local = useBranches();
 
   const github = useSWR(
     isGitHub && owner && repo
@@ -134,7 +134,7 @@ export function useUnifiedTags() {
   const isGitHub = useIsGitHub();
   const { owner, repo } = useGitHubParams();
 
-  const local = gitHooks.useTags();
+  const local = useTags();
 
   const github = useSWR(
     isGitHub && owner && repo
@@ -167,7 +167,7 @@ export function useUnifiedDiff(from: string | null, to: string | null) {
   const isGitHub = useIsGitHub();
   const { owner, repo } = useGitHubParams();
 
-  const local = gitHooks.useDiff(isGitHub ? null : from, isGitHub ? null : to);
+  const local = useDiff(isGitHub ? null : from, isGitHub ? null : to);
 
   const github = useSWR(
     isGitHub && owner && repo && from && to
