@@ -50,6 +50,9 @@ export function StashList() {
   }>({ open: false, index: -1 });
   const [dropLoading, setDropLoading] = useState(false);
 
+  const [applyingIndex, setApplyingIndex] = useState<number | null>(null);
+  const [poppingIndex, setPoppingIndex] = useState<number | null>(null);
+
   const stashes = data?.stashes || [];
   const hasUncommitted = status && !status.isClean;
 
@@ -72,22 +75,28 @@ export function StashList() {
   }
 
   async function handleApply(index: number) {
+    setApplyingIndex(index);
     try {
       const result = await mutations.stashApply(index);
       if (result.success) toast.success(result.message);
       else toast.error(result.message);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Apply failed");
+    } finally {
+      setApplyingIndex(null);
     }
   }
 
   async function handlePop(index: number) {
+    setPoppingIndex(index);
     try {
       const result = await mutations.stashPop(index);
       if (result.success) toast.success(result.message);
       else toast.error(result.message);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Pop failed");
+    } finally {
+      setPoppingIndex(null);
     }
   }
 
@@ -226,6 +235,8 @@ export function StashList() {
                     variant="outline"
                     size="sm"
                     onClick={() => handlePop(stash.index)}
+                    isLoading={poppingIndex === stash.index}
+                    disabled={applyingIndex !== null || poppingIndex !== null}
                     className="border-white/10 text-xs transition-colors hover:bg-white/[0.04]"
                   >
                     <ArrowUpFromLine size={12} className="mr-1" />
@@ -235,6 +246,8 @@ export function StashList() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleApply(stash.index)}
+                    isLoading={applyingIndex === stash.index}
+                    disabled={applyingIndex !== null || poppingIndex !== null}
                     className="border-white/10 text-xs transition-colors hover:bg-white/[0.04]"
                   >
                     <Play size={12} className="mr-1" />

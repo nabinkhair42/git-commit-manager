@@ -35,7 +35,9 @@ const ModeContext = createContext<ModeContextValue>({
 });
 
 export function ModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<AppMode>("local");
+  const isProduction = typeof window !== "undefined"
+    && process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+  const [mode, setModeState] = useState<AppMode>(isProduction ? "github" : "local");
   const [githubRepo, setGitHubRepo] = useState<GitHubRepo | null>(null);
 
   const setMode = useCallback((newMode: AppMode) => {

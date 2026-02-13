@@ -64,6 +64,7 @@ export function BranchList() {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [search, setSearch] = useState("");
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   const allBranches = data?.branches || [];
 
@@ -98,6 +99,7 @@ export function BranchList() {
   }
 
   async function handleCheckout(name: string) {
+    setCheckoutLoading(name);
     try {
       const result = await mutations.checkoutBranch(name);
       if (result.success) {
@@ -107,6 +109,8 @@ export function BranchList() {
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Checkout failed");
+    } finally {
+      setCheckoutLoading(null);
     }
   }
 
@@ -267,6 +271,8 @@ export function BranchList() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleCheckout(branch.name)}
+                      isLoading={checkoutLoading === branch.name}
+                      disabled={checkoutLoading !== null}
                       className="border-white/[0.1] text-xs transition-colors hover:bg-white/[0.04]"
                     >
                       Switch
@@ -359,6 +365,8 @@ export function BranchList() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleCheckout(branch.name)}
+                          isLoading={checkoutLoading === branch.name}
+                          disabled={checkoutLoading !== null}
                           className="border-white/[0.1] text-xs transition-colors hover:bg-white/[0.04]"
                         >
                           Checkout

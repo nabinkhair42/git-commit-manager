@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   FolderGit2,
@@ -8,10 +8,10 @@ import {
   X,
   ArrowRight,
   LogOut,
-  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useRecentRepos } from "@/hooks/use-recent-repos";
 import { validateRepo } from "@/services/frontend/git.services";
 import { PathInput } from "@/components/repo/path-input";
@@ -19,18 +19,21 @@ import { GitHubRepoPicker } from "@/components/github/repo-picker";
 import { useMode, type AppMode } from "@/hooks/use-mode";
 import { signIn, signOut, useSession } from "@/lib/auth-client";
 
+const isProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+
 export function RepoSelector() {
   const searchParams = useSearchParams();
-  const initialMode = (searchParams.get("mode") as AppMode) || "local";
+  const initialMode = (searchParams.get("mode") as AppMode) || (isProduction ? "github" : "local");
   const { mode, setMode } = useMode();
   const { data: session, isPending: sessionLoading } = useSession();
 
   // Sync mode from URL on mount
-  useState(() => {
-    if (initialMode === "github" || initialMode === "local") {
-      setMode(initialMode);
+  useEffect(() => {
+    const urlMode = isProduction ? "github" : initialMode;
+    if (urlMode === "github" || urlMode === "local") {
+      setMode(urlMode);
     }
-  });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="page-rails flex min-h-screen flex-col">
@@ -56,32 +59,34 @@ export function RepoSelector() {
           </div>
 
           {/* Mode switch tabs */}
-          <div className="mx-auto mb-8 flex max-w-xs items-center rounded-lg border border-border bg-white/[0.02] p-1">
-            <button
-              type="button"
-              onClick={() => setMode("local")}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                mode === "local"
-                  ? "bg-foreground text-background shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <FolderGit2 size={14} />
-              Local
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("github")}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                mode === "github"
-                  ? "bg-foreground text-background shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Github size={14} />
-              GitHub
-            </button>
-          </div>
+          {!isProduction ? (
+            <div className="mx-auto mb-8 flex max-w-xs items-center rounded-lg border border-border bg-white/[0.02] p-1">
+              <button
+                type="button"
+                onClick={() => setMode("local")}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                  mode === "local"
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <FolderGit2 size={14} />
+                Local
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("github")}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                  mode === "github"
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Github size={14} />
+                GitHub
+              </button>
+            </div>
+          ) : null}
 
           {/* Mode content */}
           {mode === "local" ? (
@@ -211,10 +216,48 @@ function GitHubModeContent({
   session: { user: { name: string; image?: string | null; email: string } } | null;
   sessionLoading: boolean;
 }) {
+  const [signInLoading, setSignInLoading] = useState(false);
+  const [signOutLoading, setSignOutLoading] = useState(false);
+
   if (sessionLoading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      <div className="mt-2">
+        {/* User info bar skeleton */}
+        <div className="mx-auto mb-6 flex max-w-2xl items-center justify-between rounded-lg border border-border bg-white/[0.02] px-4 py-2.5">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-7 w-7 rounded-full" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+          <Skeleton className="h-8 w-20 rounded-md" />
+        </div>
+
+        {/* Repo picker skeleton */}
+        <div className="mx-auto w-full max-w-2xl">
+          <Skeleton className="mb-4 h-11 w-full rounded-md" />
+          <div className="rounded-lg border border-border">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className={`flex items-start gap-3 px-4 py-3.5 ${
+                  i !== 0 ? "border-t border-border" : ""
+                }`}
+              >
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-4 w-14 rounded-full" />
+                  </div>
+                  <Skeleton className="h-3 w-3/4" />
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-3 w-10" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -227,9 +270,11 @@ function GitHubModeContent({
           and explore diffs — all from the browser.
         </p>
         <Button
-          onClick={() =>
-            signIn.social({ provider: "github", callbackURL: "/?mode=github" })
-          }
+          onClick={() => {
+            setSignInLoading(true);
+            signIn.social({ provider: "github", callbackURL: "/?mode=github" });
+          }}
+          isLoading={signInLoading}
           className="h-11 gap-2 bg-foreground px-6 text-sm font-medium text-background transition-opacity hover:opacity-80"
         >
           <Github size={16} />
@@ -260,7 +305,11 @@ function GitHubModeContent({
           variant="ghost"
           size="sm"
           className="text-xs text-muted-foreground"
-          onClick={() => signOut()}
+          isLoading={signOutLoading}
+          onClick={() => {
+            setSignOutLoading(true);
+            signOut();
+          }}
         >
           <LogOut size={12} className="mr-1" />
           Sign out

@@ -1,4 +1,4 @@
-export { getGitClient, validateRepo } from "./client";
+export { getGitClient, validateRepo, isLocalModeAllowed } from "./client";
 export { getCommits, getCommitDetail } from "./commits";
 export { getBranches, createBranch, deleteBranch, deleteRemoteBranch, checkoutBranch, mergeBranch } from "./branches";
 export { getDiff } from "./diff";
