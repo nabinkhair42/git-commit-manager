@@ -92,7 +92,6 @@ export async function getCommitDetail(
     owner,
     repo,
     ref: hash,
-    mediaType: { format: "diff" },
   });
 
   const commit = data;

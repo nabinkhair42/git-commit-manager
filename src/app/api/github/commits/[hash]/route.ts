@@ -23,6 +23,7 @@ export async function GET(
     const data = await getCommitDetail(token, owner, repo, hash);
     return NextResponse.json({ success: true, data });
   } catch (error) {
+    console.error("[API] Failed to fetch GitHub commit detail:", error);
     const message =
       error instanceof Error ? error.message : "Failed to fetch commit detail";
     return NextResponse.json({ success: false, error: message }, { status: 500 });
