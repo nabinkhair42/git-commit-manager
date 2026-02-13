@@ -1,6 +1,9 @@
 # Git Commit Manager
 
-A local web-based GUI for managing Git repositories. Point it at any repo on your machine and get a clean, dark-mode interface for browsing history, managing branches, comparing diffs, and performing operations -- without memorizing CLI flags and commit hashes.
+A web-based GUI for managing Git repositories. Works in two modes:
+
+- **Local mode** -- point it at any repo on your machine and get a clean, dark-mode interface for browsing history, managing branches, comparing diffs, and performing operations without memorizing CLI flags and commit hashes.
+- **GitHub mode** -- sign in with GitHub and browse your remote repositories read-only. View commits, branches, tags, and diffs.
 
 ## Why
 
@@ -11,17 +14,18 @@ Git is powerful but unforgiving from the command line. A wrong `git reset --hard
 - **Browse commit history** with search, branch filtering, and pagination
 - **View detailed diffs** for any commit, or compare any two commits side-by-side (unified or split view)
 - **Reset, cherry-pick, and revert** commits with safety-tiered confirmation dialogs (destructive operations require typed confirmation)
-- **Manage branches** -- create, switch, delete, force-delete, and merge, with both local and remote branches visible
+- **Manage branches** -- create, switch, delete (local and remote), force-delete, and merge
 - **Manage tags** -- create lightweight or annotated tags, search/filter, delete
 - **Stash changes** -- save, apply, pop, drop, or clear stashes from the UI
 - **Copy commit hashes** with a single click
 - **Navigate with keyboard shortcuts** -- press 1-5 to jump between pages
+- **Browse GitHub repos** -- sign in with GitHub OAuth to view remote repositories read-only
 
 ## How It Works
 
-Runs entirely on localhost. You open the app, type a path (with autocomplete), and it connects to that repo using `simple-git`. No database, no accounts, no cloud. All state comes from Git itself. Recent repos are remembered in localStorage for quick access.
+**Local mode**: Enter a repo path (with filesystem autocomplete), and it connects using `simple-git`. No database needed for local mode. All state comes from Git. Recent repos are remembered in localStorage. Each repo is identified by its path in the URL, so you can have multiple repos open in different tabs.
 
-Each repo is identified by its path in the URL (`?path=/abs/path`), so you can have multiple repos open in different browser tabs, and every view is bookmarkable.
+**GitHub mode**: Sign in with GitHub OAuth. Your session is stored in Neon Postgres via better-auth. Browse your repositories, view commits, branches, tags, and diffs. Write operations are hidden in GitHub mode.
 
 ## Safety
 
@@ -32,7 +36,7 @@ Operations are grouped into tiers:
 | Safe | Log, diff, status | None |
 | Moderate | Cherry-pick, revert, merge | Confirmation dialog |
 | Dangerous | Soft/mixed reset, delete branch | Warning + confirmation |
-| Critical | Hard reset, force-delete branch | Typed confirmation required |
+| Critical | Hard reset, force-delete branch, delete remote branch | Typed confirmation required |
 
 ## Getting Started
 
@@ -43,6 +47,29 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) and enter a path to any local Git repository.
 
+### GitHub Mode Setup
+
+1. Create a GitHub OAuth app (or use an existing one)
+2. Copy `.env.example` to `.env` and fill in the values:
+   - `DATABASE_URL` -- Neon Postgres connection string
+   - `BETTER_AUTH_SECRET` -- random secret for auth
+   - `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` -- from your GitHub OAuth app
+3. Run database migrations:
+   ```bash
+   pnpm db:generate
+   pnpm db:migrate
+   ```
+4. Start the app and click "Sign in with GitHub"
+
+### Database Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `pnpm db:generate` | Generate migration files from schema changes |
+| `pnpm db:migrate` | Run pending migrations |
+| `pnpm db:push` | Push schema directly to database (dev only) |
+| `pnpm db:studio` | Open Drizzle Studio for database inspection |
+
 ## Tech
 
-Next.js, TypeScript, Tailwind CSS, shadcn/ui, simple-git, SWR, diff2html.
+Next.js, TypeScript, Tailwind CSS, shadcn/ui, simple-git, Octokit, better-auth, Drizzle ORM, Neon Postgres, SWR, diff2html.
