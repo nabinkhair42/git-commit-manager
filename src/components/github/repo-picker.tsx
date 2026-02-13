@@ -8,11 +8,11 @@ import {
   Star,
   Search,
   ArrowRight,
-  Loader2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGitHubRepos } from "@/hooks/use-github";
 import { useMode, type GitHubRepo } from "@/hooks/use-mode";
@@ -51,11 +51,34 @@ export function GitHubRepoPicker() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        <span className="ml-3 text-sm text-muted-foreground">
-          Loading repositories...
-        </span>
+      <div className="mx-auto w-full max-w-2xl">
+        {/* Search bar skeleton */}
+        <Skeleton className="mb-4 h-11 w-full rounded-md" />
+
+        {/* Repo list skeleton */}
+        <div className="rounded-lg border border-border">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className={`flex items-start gap-3 px-4 py-3.5 ${
+                i !== 0 ? "border-t border-border" : ""
+              }`}
+            >
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-36" />
+                  {i % 3 === 0 && <Skeleton className="h-3 w-3 rounded" />}
+                  <Skeleton className="h-4 w-14 rounded-full" />
+                </div>
+                <Skeleton className={`h-3 ${["w-3/4", "w-1/2", "w-2/3", "w-3/5", "w-1/2", "w-2/3"][i]}`} />
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-3 w-14" />
+                  {i % 2 === 0 && <Skeleton className="h-3 w-10" />}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
