@@ -200,7 +200,7 @@ export function StashList() {
             {stashes.map((stash, i) => (
               <div
                 key={stash.index}
-                className={`group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-accent/50 ${
+                className={`group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-muted ${
                   i !== 0 ? "border-t border-dashed border-border" : ""
                 }`}
               >
@@ -237,7 +237,7 @@ export function StashList() {
                     onClick={() => handlePop(stash.index)}
                     isLoading={poppingIndex === stash.index}
                     disabled={applyingIndex !== null || poppingIndex !== null}
-                    className="border-border text-xs transition-colors hover:bg-accent/60"
+                    className="border-border text-xs transition-colors hover:bg-accent"
                   >
                     <ArrowUpFromLine size={12} className="mr-1" />
                     Pop
@@ -248,7 +248,7 @@ export function StashList() {
                     onClick={() => handleApply(stash.index)}
                     isLoading={applyingIndex === stash.index}
                     disabled={applyingIndex !== null || poppingIndex !== null}
-                    className="border-border text-xs transition-colors hover:bg-accent/60"
+                    className="border-border text-xs transition-colors hover:bg-accent"
                   >
                     <Play size={12} className="mr-1" />
                     Apply
@@ -308,7 +308,7 @@ export function StashList() {
             <Button
               variant="outline"
               onClick={() => setSaveOpen(false)}
-              className="border-border transition-colors hover:bg-accent/60"
+              className="border-border transition-colors hover:bg-accent"
             >
               Cancel
             </Button>

@@ -105,7 +105,7 @@ export function CommitDetail({ hash }: CommitDetailProps) {
           {commit.files.map((file, i) => (
             <div
               key={file.file}
-              className={`flex items-center gap-3 px-6 py-2.5 transition-colors hover:bg-accent/50 ${
+              className={`flex items-center gap-3 px-6 py-2.5 transition-colors hover:bg-muted ${
                 i !== 0 ? "border-t border-dashed border-border" : ""
               }`}
             >

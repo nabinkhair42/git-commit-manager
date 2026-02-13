@@ -205,7 +205,7 @@ export function PathInput({
                 className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors ${
                   i === activeIndex
                     ? "bg-primary/15 text-foreground"
-                    : "text-foreground/80 hover:bg-accent/60"
+                    : "text-foreground/80 hover:bg-accent"
                 } ${i !== 0 ? "border-t border-dashed border-border" : ""}`}
               >
                 {s.isGitRepo ? (

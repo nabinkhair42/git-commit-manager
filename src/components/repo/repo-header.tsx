@@ -66,7 +66,6 @@ export function RepoHeader() {
             href={isGitHub ? "/?mode=github" : "/"}
             className="flex items-center gap-2 text-foreground transition-colors hover:text-foreground/80"
           >
-            {/* Inline logo */}
             <GitManagerAppIcon className="size-5" />
             <span className="font-semibold tracking-tight">{displayName}</span>
           </Link>

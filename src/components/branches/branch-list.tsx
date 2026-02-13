@@ -180,7 +180,7 @@ export function BranchList() {
                   variant="outline"
                   size="sm"
                   onClick={() => setMergeOpen(true)}
-                  className="border-border transition-colors hover:bg-accent/60"
+                  className="border-border transition-colors hover:bg-accent"
                 >
                   <GitMerge size={14} className="mr-1.5" />
                   Merge
@@ -234,7 +234,7 @@ export function BranchList() {
             {localBranches.map((branch, i) => (
               <div
                 key={branch.name}
-                className={`group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-accent/50 ${
+                className={`group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-muted ${
                   i !== 0 ? "border-t border-dashed border-border" : ""
                 }`}
               >
@@ -273,7 +273,7 @@ export function BranchList() {
                       onClick={() => handleCheckout(branch.name)}
                       isLoading={checkoutLoading === branch.name}
                       disabled={checkoutLoading !== null}
-                      className="border-border text-xs transition-colors hover:bg-accent/60"
+                      className="border-border text-xs transition-colors hover:bg-accent"
                     >
                       Switch
                     </Button>
@@ -334,7 +334,7 @@ export function BranchList() {
                 {remoteBranches.map((branch, i) => (
                   <div
                     key={branch.name}
-                    className={`group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-accent/50 ${
+                    className={`group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-muted ${
                       i !== 0 ? "border-t border-dashed border-border" : ""
                     }`}
                   >
@@ -367,7 +367,7 @@ export function BranchList() {
                           onClick={() => handleCheckout(branch.name)}
                           isLoading={checkoutLoading === branch.name}
                           disabled={checkoutLoading !== null}
-                          className="border-border text-xs transition-colors hover:bg-accent/60"
+                          className="border-border text-xs transition-colors hover:bg-accent"
                         >
                           Checkout
                         </Button>
@@ -434,7 +434,7 @@ export function BranchList() {
             <Button
               variant="outline"
               onClick={() => setCreateOpen(false)}
-              className="border-border transition-colors hover:bg-accent/60"
+              className="border-border transition-colors hover:bg-accent"
             >
               Cancel
             </Button>
@@ -482,7 +482,7 @@ export function BranchList() {
             <Button
               variant="outline"
               onClick={() => setMergeOpen(false)}
-              className="border-border transition-colors hover:bg-accent/60"
+              className="border-border transition-colors hover:bg-accent"
             >
               Cancel
             </Button>

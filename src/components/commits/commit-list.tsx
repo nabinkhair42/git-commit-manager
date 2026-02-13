@@ -180,7 +180,7 @@ export function CommitList() {
               type="submit"
               variant="outline"
               size="sm"
-              className="border-border transition-colors hover:bg-accent/60"
+              className="border-border transition-colors hover:bg-accent"
             >
               Search
             </Button>
@@ -222,7 +222,7 @@ export function CommitList() {
             {data?.commits.map((commit, i) => (
               <div
                 key={commit.hash}
-                className={`group flex items-start gap-4 px-6 py-4 transition-colors hover:bg-accent/50 ${
+                className={`group flex items-start gap-4 px-6 py-4 transition-colors hover:bg-muted ${
                   i !== 0 ? "border-t border-dashed border-border" : ""
                 }`}
               >
@@ -353,7 +353,7 @@ export function CommitList() {
                   size="sm"
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="border-border transition-colors hover:bg-accent/60"
+                  className="border-border transition-colors hover:bg-accent"
                 >
                   <ChevronLeft size={14} />
                   Previous
@@ -363,7 +363,7 @@ export function CommitList() {
                   size="sm"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page + 1 >= totalPages}
-                  className="border-border transition-colors hover:bg-accent/60"
+                  className="border-border transition-colors hover:bg-accent"
                 >
                   Next
                   <ChevronRight size={14} />

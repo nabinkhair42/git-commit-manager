@@ -74,7 +74,7 @@ export function ConfirmationDialog({
         )}
 
         <AlertDialogFooter>
-          <AlertDialogCancel className="border-border transition-colors hover:bg-accent/60">
+          <AlertDialogCancel className="border-border transition-colors hover:bg-accent">
             Cancel
           </AlertDialogCancel>
           <Button

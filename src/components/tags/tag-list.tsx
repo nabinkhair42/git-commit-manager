@@ -164,7 +164,7 @@ export function TagList() {
             {filteredTags.map((tag, i) => (
               <div
                 key={tag.name}
-                className={`group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-accent/50 ${
+                className={`group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-muted ${
                   i !== 0 ? "border-t border-dashed border-border" : ""
                 }`}
               >
@@ -221,7 +221,7 @@ export function TagList() {
                       navigator.clipboard.writeText(tag.name);
                       toast.success("Tag name copied");
                     }}
-                    className="border-border text-xs opacity-0 transition-all group-hover:opacity-100 hover:bg-accent/60"
+                    className="border-border text-xs opacity-0 transition-all group-hover:opacity-100 hover:bg-accent"
                   >
                     Copy
                   </Button>
@@ -302,7 +302,7 @@ export function TagList() {
             <Button
               variant="outline"
               onClick={() => setCreateOpen(false)}
-              className="border-border transition-colors hover:bg-accent/60"
+              className="border-border transition-colors hover:bg-accent"
             >
               Cancel
             </Button>
