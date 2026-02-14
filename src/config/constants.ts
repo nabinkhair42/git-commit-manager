@@ -59,6 +59,9 @@ export const AI_MODELS = [
   { id: "claude-sonnet-4-5-20250929", name: "Claude Sonnet 4.5", provider: "anthropic", logo: modelLogo("anthropic") },
   { id: "claude-opus-4-6", name: "Claude Opus 4.6", provider: "anthropic", logo: modelLogo("anthropic") },
   { id: "grok-3", name: "Grok 3", provider: "xai", logo: modelLogo("xai") },
+  { id: "lmstudio-local", name: "LM Studio (Local)", provider: "lmstudio", logo: modelLogo("lmstudio") },
+  { id: "sonar-pro", name: "Sonar Pro", provider: "perplexity", logo: modelLogo("perplexity") },
+  { id: "sonar", name: "Sonar", provider: "perplexity", logo: modelLogo("perplexity") },
 ] as const;
 
 export type AIModel = (typeof AI_MODELS)[number];
