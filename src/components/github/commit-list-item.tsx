@@ -114,6 +114,7 @@ export function CommitListItem({
             variant="ghost"
             size="icon"
             className="size-8 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+            onClick={(e) => e.stopPropagation()}
           >
             <MoreHorizontal size={14} />
           </Button>

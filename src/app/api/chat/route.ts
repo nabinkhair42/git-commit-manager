@@ -28,14 +28,17 @@ function extractRepoFromHistory(
     // Check assistant messages for selectRepository tool calls
     if (msg.role === "assistant") {
       for (const part of msg.parts) {
+        const p = part as Record<string, unknown>;
         if (
-          part.type === "tool-invocation" &&
-          part.toolName === "selectRepository" &&
-          part.state === "result" &&
-          part.args?.owner &&
-          part.args?.repo
+          typeof p.type === "string" &&
+          p.type === "tool-selectRepository" &&
+          p.state === "output-available"
         ) {
-          return { owner: part.args.owner, repo: part.args.repo };
+          // Saved parts use "input" (not "args") for tool arguments
+          const input = (p.input ?? p.args) as Record<string, string> | undefined;
+          if (input?.owner && input?.repo) {
+            return { owner: input.owner, repo: input.repo };
+          }
         }
       }
     }

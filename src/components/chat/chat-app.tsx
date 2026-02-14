@@ -5,6 +5,7 @@ import { ChatMessages } from "@/components/chat/chat-message";
 import { EmptyChatState } from "@/components/chat/empty-chat-state";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { Spinner } from "@/components/ui/spinner";
+import { AI_MODELS, STORAGE_KEYS } from "@/config/constants";
 import { useRepo } from "@/hooks/use-repo";
 import { useChatHistory } from "@/hooks/use-chat-history";
 import { useActiveChat } from "@/hooks/use-active-chat";
@@ -20,7 +21,6 @@ import {
   DefaultChatTransport,
   lastAssistantMessageIsCompleteWithApprovalResponses,
 } from "ai";
-import { useRouter } from "next/navigation";
 import { useMemo, useRef, useEffect, useCallback } from "react";
 
 export function ChatApp({ chatId }: { chatId: string | null }) {
@@ -55,8 +55,13 @@ function ChatAppInner({
 }) {
   const { githubOwner, githubRepoName } = useRepo();
   const { mutate: mutateChatHistory } = useChatHistory();
-  const router = useRouter();
-  const modelRef = useRef("gpt-4o");
+  const modelRef = useRef(
+    (() => {
+      if (typeof window === "undefined") return AI_MODELS[0].id;
+      const stored = localStorage.getItem(STORAGE_KEYS.selectedModel);
+      return AI_MODELS.some((m) => m.id === stored) ? stored! : AI_MODELS[0].id;
+    })(),
+  );
 
   const createdChatIdRef = useRef<string | null>(activeChatId);
   const prevStatusRef = useRef<string>("ready");
@@ -84,7 +89,6 @@ function ChatAppInner({
     });
 
   // Save messages when AI response completes (any non-ready → ready)
-  // Also sync Next.js router state after streaming completes for new chats
   useEffect(() => {
     const prevStatus = prevStatusRef.current;
     prevStatusRef.current = status;
@@ -99,13 +103,8 @@ function ChatAppInner({
         .saveMessages(createdChatIdRef.current, messages)
         .catch(console.error);
       mutateChatHistory();
-
-      // Sync Next.js router state if URL was updated via history.replaceState
-      if (!activeChatId && createdChatIdRef.current) {
-        router.replace(`/chats/${createdChatIdRef.current}`);
-      }
     }
-  }, [status, messages, mutateChatHistory, activeChatId, router]);
+  }, [status, messages, mutateChatHistory]);
 
   const handleSend = useCallback(
     async (text: string, mentions: MentionItem[], model: string) => {
@@ -125,28 +124,26 @@ function ChatAppInner({
         messageText = text + contextBlock;
       }
 
-      // If no active chat, create one first
-      if (!createdChatIdRef.current) {
-        try {
-          const newChat = await chatService.createChat();
-          createdChatIdRef.current = newChat.id;
-          // Update URL without remounting (preserves streaming connection)
-          window.history.replaceState(null, "", `/chats/${newChat.id}`);
-          mutateChatHistory();
-
-          // Generate title in background
-          chatService
-            .generateChatTitle(newChat.id, messageText, model)
-            .then(() => {
-              mutateChatHistory();
-            })
-            .catch(console.error);
-        } catch (error) {
-          console.error("Failed to create chat:", error);
-        }
-      }
-
+      // Send message immediately — don't block on chat creation
       sendMessage({ text: messageText });
+
+      // Create chat in background if this is a new conversation
+      if (!createdChatIdRef.current) {
+        chatService
+          .createChat()
+          .then((newChat) => {
+            createdChatIdRef.current = newChat.id;
+            window.history.replaceState(null, "", `/chats/${newChat.id}`);
+            mutateChatHistory();
+
+            // Generate title in background
+            chatService
+              .generateChatTitle(newChat.id, messageText, model)
+              .then(() => mutateChatHistory())
+              .catch(console.error);
+          })
+          .catch(console.error);
+      }
     },
     [githubOwner, githubRepoName, sendMessage, mutateChatHistory],
   );

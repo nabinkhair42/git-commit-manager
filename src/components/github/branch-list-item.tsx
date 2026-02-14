@@ -65,13 +65,17 @@ export function BranchListItem({
                 variant="ghost"
                 size="icon"
                 className="size-8 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                onClick={(e) => e.stopPropagation()}
               >
                 <MoreHorizontal size={14} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                onClick={() => onDelete?.()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.();
+                }}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 size={14} className="mr-2" />

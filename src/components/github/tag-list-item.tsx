@@ -84,7 +84,8 @@ export function TagListItem({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             navigator.clipboard.writeText(name);
             toast.success("Tag name copied");
           }}
@@ -98,6 +99,7 @@ export function TagListItem({
               variant="ghost"
               size="icon"
               className="size-8 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+              onClick={(e) => e.stopPropagation()}
             >
               <MoreHorizontal size={14} />
             </Button>

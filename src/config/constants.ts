@@ -63,6 +63,12 @@ export const AI_MODELS = [
 
 export type AIModel = (typeof AI_MODELS)[number];
 
+// ─── Storage Keys ────────────────────────────────────────────────────────
+
+export const STORAGE_KEYS = {
+  selectedModel: "gitpilot:selected-model",
+} as const;
+
 export const FILE_STATUS_COLORS: Record<string, string> = {
   A: "text-git-added",
   M: "text-git-modified",

@@ -19,7 +19,7 @@ import {
 import { MentionChips } from "@/components/chat/mention-chips";
 import { MentionPicker } from "@/components/chat/mention-picker";
 import { Button } from "@/components/ui/button";
-import { AI_MODELS, MENTION_CATEGORY_SHORTCUTS } from "@/config/constants";
+import { AI_MODELS, MENTION_CATEGORY_SHORTCUTS, STORAGE_KEYS } from "@/config/constants";
 import { useMentionQuery } from "@/hooks/use-mention-query";
 import { useMentions } from "@/hooks/use-mentions";
 import type { MentionCategory, MentionItem } from "@/lib/mentions/types";
@@ -166,7 +166,12 @@ function ChatInputInner({ onSend, onStop, status, disabled }: ChatInputProps) {
   const { textInput } = usePromptInputController();
   const [selectedModel, setSelectedModel] = useState<
     (typeof AI_MODELS)[number]["id"]
-  >(AI_MODELS[0].id);
+  >(() => {
+    if (typeof window === "undefined") return AI_MODELS[0].id;
+    const stored = localStorage.getItem(STORAGE_KEYS.selectedModel);
+    const valid = AI_MODELS.some((m) => m.id === stored);
+    return valid ? (stored as (typeof AI_MODELS)[number]["id"]) : AI_MODELS[0].id;
+  });
 
   const { mentions, addMention, removeMention, clearMentions } = useMentions();
   const { query, updateQuery, clearQuery } = useMentionQuery();
@@ -359,7 +364,10 @@ function ChatInputInner({ onSend, onStop, status, disabled }: ChatInputProps) {
                 {AI_MODELS.map((model) => (
                   <DropdownMenuItem
                     key={model.id}
-                    onClick={() => setSelectedModel(model.id)}
+                    onClick={() => {
+                      setSelectedModel(model.id);
+                      localStorage.setItem(STORAGE_KEYS.selectedModel, model.id);
+                    }}
                   >
                     <img
                       src={model.logo}
