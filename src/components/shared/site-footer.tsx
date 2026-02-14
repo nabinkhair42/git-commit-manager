@@ -29,7 +29,7 @@ export function SiteFooter() {
           className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
         >
           <GitManagerAppIcon className="size-4" />
-          <span className="text-xs font-medium">Git Commit Manager</span>
+          <span className="text-xs font-medium">GitPilot</span>
         </Link>
 
         {/* Right — theme switcher */}

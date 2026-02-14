@@ -1,32 +1,55 @@
-# Git Commit Manager
+# GitPilot
 
-A web-based GUI for managing Git repositories. Works in two modes:
+An AI-powered visual Git client that works with local repositories and GitHub. Browse history, manage branches and tags, cherry-pick, revert, reset, compare diffs, stash changes, and chat with an AI assistant that has full repo context.
 
-- **Local mode** -- point it at any repo on your machine and get a clean, dark-mode interface for browsing history, managing branches, comparing diffs, and performing operations without memorizing CLI flags and commit hashes.
-- **GitHub mode** -- sign in with GitHub and browse your remote repositories read-only. View commits, branches, tags, and diffs.
+## Two Modes
 
-## Why
+- **Local mode** — point it at any repo on your machine. Full read/write access: commits, branches, tags, stashes, cherry-pick, revert, reset, and more.
+- **GitHub mode** — sign in with GitHub OAuth and manage your remote repositories. View and operate on commits, branches, tags, and diffs through the GitHub API.
 
-Git is powerful but unforgiving from the command line. A wrong `git reset --hard` loses work. Cherry-picking requires copy-pasting hashes. Comparing arbitrary commits means juggling flags. This tool wraps all of that in a visual interface with built-in safety nets.
+## Features
 
-## What You Can Do
+### Commit Management
+- Browse commit history with search, branch filtering, and pagination
+- View detailed diffs for any commit (unified or split view with toggle icons)
+- Cherry-pick commits onto the current branch
+- Revert commits by creating undo commits
+- Reset branch to any commit (soft, mixed, or hard)
+- Copy commit hashes with a single click
 
-- **Browse commit history** with search, branch filtering, and pagination
-- **View detailed diffs** for any commit, or compare any two commits side-by-side (unified or split view)
-- **Reset, cherry-pick, and revert** commits with safety-tiered confirmation dialogs (destructive operations require typed confirmation)
-- **Manage branches** -- create, switch, delete (local and remote), force-delete, and merge
-- **Manage tags** -- create lightweight or annotated tags, search/filter, delete
-- **Stash changes** -- save, apply, pop, drop, or clear stashes from the UI
-- **Copy commit hashes** with a single click
-- **Navigate with keyboard shortcuts** -- press 1-5 to jump between pages
-- **Browse GitHub repos** -- sign in with GitHub OAuth to view remote repositories read-only
-- **Reference repo entities in chat** -- type `@` to reference files, commits, branches, tags, and stashes for AI-enriched context
+### Branch Management
+- Create, switch, delete (local and remote), force-delete, and merge branches
+- Branch deletion supported in both local and GitHub modes
 
-## How It Works
+### Tag Management
+- Create lightweight or annotated tags
+- Search, filter, and delete tags
 
-**Local mode**: Enter a repo path (with filesystem autocomplete), and it connects using `simple-git`. No database needed for local mode. All state comes from Git. Recent repos are remembered in localStorage. Each repo is identified by its path in the URL, so you can have multiple repos open in different tabs.
+### Stash Management (Local Mode)
+- Save, apply, pop, drop, or clear stashes from the UI
 
-**GitHub mode**: Sign in with GitHub OAuth. Your session is stored in Neon Postgres via better-auth. Browse your repositories, view commits, branches, tags, and diffs. Write operations are hidden in GitHub mode.
+### Diff & Compare
+- Compare any two commits side-by-side
+- Switch between unified and split diff views
+- Diff view with proper line numbers and overflow handling
+
+### AI Chat Assistant
+- Built-in chat sidebar with AI that has full repo context
+- Inline `@` mention system to reference files, commits, branches, tags, stashes, and repositories
+- Category shortcuts: `@file:`, `@commit:`, `@branch:`, `@tag:`, `@stash:`, `@repo:`
+- Cross-category search with bare `@` queries
+- Chat works even without a selected repo (use `@repo:` to reference any repository)
+
+### Navigation & UX
+- Keyboard shortcuts (press 1–5 to jump between pages)
+- Page descriptions on all five pages (Commits, Branches, Compare, Stash, Tags)
+- Safety-tiered confirmation dialogs for destructive operations
+- Responsive design with mobile chat overlay
+
+### GitHub Mode Operations
+- All 11 API routes standardized with consistent error handling
+- Branch deletion, cherry-pick, revert, and reset via GitHub API
+- Async parallelization across 5 service functions for faster loading
 
 ## Safety
 
@@ -52,9 +75,9 @@ Open [http://localhost:3000](http://localhost:3000) and enter a path to any loca
 
 1. Create a GitHub OAuth app (or use an existing one)
 2. Copy `.env.example` to `.env` and fill in the values:
-   - `DATABASE_URL` -- Neon Postgres connection string
-   - `BETTER_AUTH_SECRET` -- random secret for auth
-   - `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` -- from your GitHub OAuth app
+   - `DATABASE_URL` — Neon Postgres connection string
+   - `BETTER_AUTH_SECRET` — random secret for auth
+   - `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` — from your GitHub OAuth app
 3. Run database migrations:
    ```bash
    pnpm db:generate
@@ -73,4 +96,4 @@ Open [http://localhost:3000](http://localhost:3000) and enter a path to any loca
 
 ## Tech
 
-Next.js, TypeScript, Tailwind CSS, shadcn/ui, simple-git, Octokit, better-auth, Drizzle ORM, Neon Postgres, SWR, diff2html.
+Next.js, TypeScript, Tailwind CSS, shadcn/ui, simple-git, Octokit, AI SDK, better-auth, Drizzle ORM, Neon Postgres, SWR, diff2html.

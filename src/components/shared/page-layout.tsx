@@ -29,9 +29,9 @@ export function PageLayout({
           <div>
             <p className="font-medium text-muted-foreground">{label}</p>
             <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-            {description && (
+            {description ? (
               <p className="mt-1 text-xs text-muted-foreground/60">{description}</p>
-            )}
+            ) : null}
           </div>
           {actions}
         </div>

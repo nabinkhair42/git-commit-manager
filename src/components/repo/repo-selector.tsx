@@ -58,12 +58,12 @@ export function RepoSelector() {
             </div>
 
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-              Git Commit Manager
+              GitPilot
             </h1>
             <p className="mx-auto mt-4 max-w-md px-4 text-sm leading-relaxed text-muted-foreground sm:px-0 sm:text-base">
               {mode === "github"
-                ? "Browse your GitHub repositories — commits, branches, tags, and diffs."
-                : "Open any local repository to view history, manage branches, compare diffs, and perform git operations."}
+                ? "Browse and manage your GitHub repositories — commits, branches, tags, diffs, cherry-pick, revert, and more."
+                : "Open any local repository to browse history, manage branches & tags, compare diffs, cherry-pick, revert, reset, and stash."}
             </p>
           </div>
 

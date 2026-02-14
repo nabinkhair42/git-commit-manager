@@ -1,4 +1,4 @@
-export const APP_NAME = "Git Commit Manager";
+export const APP_NAME = "GitPilot";
 export const DEFAULT_COMMITS_PER_PAGE = 50;
 export const MAX_RECENT_REPOS = 50
 export const STATUS_REFRESH_INTERVAL = 5000;

@@ -96,7 +96,7 @@ export function CommitListItem({
           <span>{authorName}</span>
           <span>&middot;</span>
           <span>{formatRelativeDate(date)}</span>
-          {refs && (
+          {refs ? (
             <>
               <span>&middot;</span>
               {refs.split(",").map((ref) => (
@@ -109,7 +109,7 @@ export function CommitListItem({
                 </Badge>
               ))}
             </>
-          )}
+          ) : null}
         </div>
       </div>
 

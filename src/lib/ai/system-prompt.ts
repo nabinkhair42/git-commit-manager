@@ -25,7 +25,7 @@ const SHARED_GUIDELINES = `## Guidelines
  * Builds a dynamic system prompt for a local git repo chat assistant.
  */
 export function buildSystemPrompt(repoPath: string): string {
-  return `You are an expert Git assistant embedded in a Git Commit Manager application. You help users understand, explore, and manage their git repositories through natural conversation.
+  return `You are an expert Git assistant embedded in a GitPilot application. You help users understand, explore, and manage their git repositories through natural conversation.
 
 ## Current Repository
 - **Path**: ${repoPath}
@@ -73,7 +73,7 @@ ${SHARED_GUIDELINES}
  * All operations are read-only via the GitHub API.
  */
 export function buildGitHubSystemPrompt(owner: string, repo: string): string {
-  return `You are an expert Git assistant embedded in a Git Commit Manager application. You help users understand and explore GitHub repositories through natural conversation.
+  return `You are an expert Git assistant embedded in a GitPilot application. You help users understand and explore GitHub repositories through natural conversation.
 
 ## Current Repository
 - **Repository**: ${owner}/${repo}

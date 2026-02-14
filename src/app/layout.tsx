@@ -22,19 +22,20 @@ const siteUrl = "https://git.nabinkhair.com.np";
 export const metadata: Metadata = {
   title: {
     default:
-      "Git Commit Manager — Visual Git Client for Commits, Branches & Diffs",
-    template: "%s | Git Commit Manager",
+      "GitPilot — AI-Powered Visual Git Client for Local & GitHub Repos",
+    template: "%s | GitPilot",
   },
   description:
-    "Browse and manage Git repositories with a clean visual UI. View commit history, manage branches and tags, compare diffs, and perform git operations — locally or via GitHub.",
+    "Visual Git client with AI chat. Browse history, manage branches & tags, cherry-pick, revert, reset, compare diffs, and stash — locally or via GitHub.",
   keywords: [
     "git",
     "git client",
-    "commit manager",
     "git GUI",
+    "AI git assistant",
     "branch manager",
     "diff viewer",
     "git history",
+    "cherry-pick",
     "github browser",
     "visual git",
     "git web UI",
@@ -46,24 +47,24 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: siteUrl,
-    siteName: "Git Commit Manager",
-    title: "Git Commit Manager — Visual Git Client",
+    siteName: "GitPilot",
+    title: "GitPilot — AI-Powered Visual Git Client",
     description:
-      "Browse and manage Git repositories with a clean visual UI. View commits, branches, tags, and diffs — locally or via GitHub.",
+      "Visual Git client with AI chat. Browse history, manage branches & tags, cherry-pick, revert, reset, compare diffs, and stash — locally or via GitHub.",
     images: [
       {
         url: "/online-mode-dark.png",
         width: 1200,
         height: 630,
-        alt: "Git Commit Manager — Visual Git Client",
+        alt: "GitPilot — AI-Powered Visual Git Client",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Git Commit Manager — Visual Git Client",
+    title: "GitPilot — AI-Powered Visual Git Client",
     description:
-      "Browse and manage Git repositories with a clean visual UI. View commits, branches, tags, and diffs.",
+      "Visual Git client with AI chat. Browse history, manage branches & tags, cherry-pick, revert, reset, compare diffs, and stash.",
     images: ["/online-mode-dark.png"],
   },
   icons: {
