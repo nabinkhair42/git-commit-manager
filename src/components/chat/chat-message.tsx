@@ -1,6 +1,6 @@
 "use client";
 
-import type { UIMessage } from "ai";
+import { type UIMessage, isToolUIPart, getToolName } from "ai";
 import {
   Message,
   MessageContent,
@@ -93,16 +93,19 @@ export function ChatMessages({ messages, status, onSuggestionClick }: ChatMessag
                   return <MessageResponse key={index}>{part.text}</MessageResponse>;
                 }
 
-                if (part.type === "tool-invocation") {
-                  const toolName = part.toolName;
-                  const label = TOOL_LABELS[toolName] ?? toolName;
+                if (isToolUIPart(part)) {
+                  const name = getToolName(part);
+                  const label = TOOL_LABELS[name] ?? name;
+                  const isDynamic = part.type === "dynamic-tool";
 
                   return (
                     <Tool key={part.toolCallId}>
                       <ToolHeader
                         title={label}
-                        type={part.type}
                         state={part.state}
+                        {...(isDynamic
+                          ? { type: "dynamic-tool" as const, toolName: name }
+                          : { type: part.type as `tool-${string}` })}
                       />
                       <ToolContent>
                         <ToolInput input={part.input} />

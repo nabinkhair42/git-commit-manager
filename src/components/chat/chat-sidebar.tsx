@@ -5,20 +5,34 @@ import { ChatMessages } from "@/components/chat/chat-message";
 import { useRepo } from "@/hooks/use-repo";
 import { cn } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { Bot, MessageSquare, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export function ChatSidebar() {
-  const { repoPath, mode } = useRepo();
-  const isLocalMode = mode === "local" && !!repoPath;
+  const { repoPath, mode, githubOwner, githubRepoName } = useRepo();
+  const isChatEnabled =
+    (mode === "local" && !!repoPath) ||
+    (mode === "github" && !!githubOwner && !!githubRepoName);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        body: {
+          mode,
+          repoPath,
+          owner: githubOwner,
+          repo: githubRepoName,
+        },
+      }),
+    [mode, repoPath, githubOwner, githubRepoName],
+  );
 
   const { messages, sendMessage, status, stop, setMessages } = useChat({
     id: "repo-chat",
-    // api: "/api/chat",
-    // body: {
-    //   repoPath,
-    // },
+    transport,
   });
 
   const handleSend = (text: string) => {
@@ -105,13 +119,13 @@ export function ChatSidebar() {
 
         {/* Messages (Conversation handles scroll via use-stick-to-bottom) */}
         <div className="min-h-0 flex-1">
-          {!isLocalMode ? (
+          {!isChatEnabled ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
               <Bot className="size-10 text-muted-foreground/40" />
               <div className="space-y-1">
-                <p className="text-sm font-medium">Local Mode Required</p>
+                <p className="text-sm font-medium">No Repository Selected</p>
                 <p className="text-xs text-muted-foreground">
-                  Repo Chat is available only for local repositories.
+                  Select a repository to start chatting.
                 </p>
               </div>
             </div>
@@ -125,7 +139,7 @@ export function ChatSidebar() {
         </div>
 
         {/* Input (Bottom) */}
-        {isLocalMode && (
+        {isChatEnabled && (
           <ChatInput
             onSend={handleSend}
             onStop={stop}

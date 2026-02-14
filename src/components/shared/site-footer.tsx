@@ -21,7 +21,7 @@ export function SiteFooter() {
   }, []);
 
   return (
-    <footer className="shrink-0 border-t border-border">
+    <footer className="shrink-0 border-t border-border page-rails">
       <div className="flex h-10 rail-bounded items-center justify-between gap-4 px-4 sm:px-6">
         {/* Left — branding */}
         <Link
