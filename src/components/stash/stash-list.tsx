@@ -163,7 +163,7 @@ export function StashList() {
         ) : undefined
       }
     >
-      <div className="section-divider" aria-hidden="true" />
+      
 
       {/* Stash list */}
       <div>

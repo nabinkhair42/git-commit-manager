@@ -118,7 +118,7 @@ export function TagList() {
         ) : undefined
       }
     >
-      <div className="section-divider" aria-hidden="true" />
+      
 
       {/* Tag list */}
       <div>

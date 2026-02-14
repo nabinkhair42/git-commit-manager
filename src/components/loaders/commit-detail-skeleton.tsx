@@ -33,7 +33,7 @@ export function CommitDetailSkeleton() {
         </div>
       </div>
 
-      <div className="section-divider" aria-hidden="true" />
+      
 
       {/* Changed files */}
       <div className="rail-bounded">
@@ -55,7 +55,7 @@ export function CommitDetailSkeleton() {
         ))}
       </div>
 
-      <div className="section-divider" aria-hidden="true" />
+      
 
       {/* Diff area */}
       <div className="rail-bounded">

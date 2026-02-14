@@ -81,7 +81,7 @@ export function CommitDetail({ hash }: CommitDetailProps) {
 
       {/* Scrollable content */}
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="section-divider" aria-hidden="true" />
+        
 
         {/* File list */}
         <div className="rail-bounded">
@@ -121,7 +121,7 @@ export function CommitDetail({ hash }: CommitDetailProps) {
           </div>
         </div>
 
-        <div className="section-divider" aria-hidden="true" />
+        
 
         {/* Diff */}
         <div className="rail-bounded">

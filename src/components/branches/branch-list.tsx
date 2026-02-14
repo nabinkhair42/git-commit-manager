@@ -162,8 +162,6 @@ export function BranchList() {
         ) : undefined
       }
     >
-      <div className="section-divider" aria-hidden="true" />
-
       {/* Branch list */}
       <div>
         {isLoading ? (
@@ -177,7 +175,7 @@ export function BranchList() {
             {/* Local branches */}
             {localBranches.length > 0 && (
               <div className="px-4 pb-1 pt-4 sm:px-6">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60">
+                <p className="text-[11px] font-medium  text-muted-foreground/60">
                   Local
                 </p>
               </div>
@@ -208,7 +206,7 @@ export function BranchList() {
             {remoteBranches.length > 0 && (
               <>
                 <div className="px-4 pb-1 pt-4 mt-2 border-t border-border sm:px-6">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60">
+                  <p className="text-[11px] font-medium  text-muted-foreground/60">
                     Remote
                   </p>
                 </div>

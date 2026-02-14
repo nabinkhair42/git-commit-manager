@@ -84,7 +84,7 @@ export function CompareView() {
         </div>
       }
     >
-      <div className="section-divider" aria-hidden="true" />
+      
 
       {/* Diff output */}
       <div>

@@ -180,51 +180,46 @@ export function CommitList() {
   return (
     <>
       {/* Search and filters */}
-      <div className="">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-          <form onSubmit={handleSearch} className="flex flex-1 gap-2">
-            <InputGroup>
-              <InputGroupAddon>
-                <Search />
-              </InputGroupAddon>
-              <InputGroupInput
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search commits..."
-              />
-              <InputGroupAddon align={"inline-end"}>
-                <InputGroupButton variant={"secondary"}>
-                  Search
-                </InputGroupButton>
-              </InputGroupAddon>
-            </InputGroup>
-          </form>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+        <form onSubmit={handleSearch} className="flex flex-1 gap-2">
+          <InputGroup>
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            <InputGroupInput
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search commits..."
+            />
+            <InputGroupAddon align={"inline-end"}>
+              <InputGroupButton variant={"secondary"}>Search</InputGroupButton>
+            </InputGroupAddon>
+          </InputGroup>
+        </form>
 
-          {branchData && (
-            <Select
-              value={branch || "__all__"}
-              onValueChange={(v) => {
-                setBranch(v === "__all__" ? undefined : v);
-                setPage(0);
-              }}
-            >
-              <SelectTrigger className="h-9 w-full border-border bg-input/20 text-sm sm:w-auto sm:min-w-35">
-                <SelectValue placeholder="All branches" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__all__">All branches</SelectItem>
-                {branchData.branches.map((b) => (
-                  <SelectItem key={b.name} value={b.name}>
-                    {b.name} {b.current ? "(current)" : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        </div>
+        {branchData && (
+          <Select
+            value={branch || "__all__"}
+            onValueChange={(v) => {
+              setBranch(v === "__all__" ? undefined : v);
+              setPage(0);
+            }}
+          >
+            <SelectTrigger className="h-9 w-full border-border bg-input/20 text-sm sm:w-auto sm:min-w-35">
+              <SelectValue placeholder="All branches" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All branches</SelectItem>
+              {branchData.branches.map((b) => (
+                <SelectItem key={b.name} value={b.name}>
+                  {b.name} {b.current ? "(current)" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
-      <div className="section-divider" aria-hidden="true" />
 
       {/* Commit list */}
       <div className="">
@@ -373,7 +368,7 @@ export function CommitList() {
       {/* Pagination */}
       {totalPages > 1 && (
         <>
-          <div className="section-divider" aria-hidden="true" />
+          
           <div>
             <div className="flex items-center justify-between px-6 py-4">
               <span className="text-xs text-muted-foreground">
