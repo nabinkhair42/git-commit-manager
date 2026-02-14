@@ -4,8 +4,8 @@
 
 - Next.js app (App Router) with two modes: **Local** and **GitHub**
 - **Local mode**: Repo path in URL params (`?path=/abs/path`), stateless, bookmarkable. API routes use `simple-git` for Git operations. Runs on localhost.
-- **GitHub mode**: Authenticated via better-auth with GitHub OAuth (`repo` scope). Uses Octokit to read repositories from GitHub. Read-only (no write operations like reset, cherry-pick).
-- **AI Chat**: Sliding panel assistant using Vercel AI SDK 6 with GPT-4o. Multi-step tool calling (up to 8 steps) for autonomous repo exploration. Available in local mode only.
+- **GitHub mode**: Authenticated via better-auth with GitHub OAuth (`repo` scope). Uses Octokit for full read/write operations (commits, branches, tags, diffs, cherry-pick, revert, reset, branch deletion). All 11 GitHub API routes use standardized `server-response.ts` helpers with async parallelization.
+- **AI Chat**: Sidebar assistant using Vercel AI SDK 6. Multi-step tool calling (up to 8 steps). Available on all pages, including without a repo selected. Inline `@` mention system for referencing repo entities.
 - SWR for client-side data fetching with cache invalidation after mutations
 - Drizzle ORM with Neon Postgres for auth persistence (user, session, account tables)
 - Dark mode default via `next-themes`
@@ -16,13 +16,15 @@
 
 | Route | Purpose |
 |-------|---------|
-| `/` | Mode selector: enter local path or sign in with GitHub to browse remote repos |
+| `/` | Mode selector: enter local path or sign in with GitHub. Chat sidebar available. |
 | `/repo/commits` | Commit history with paginated table, search, filter by branch/author |
 | `/repo/commits/[hash]` | Single commit detail with file diffs |
-| `/repo/compare` | Compare two commits with diff viewer |
+| `/repo/compare` | Compare two commits with diff viewer (unified/split toggle) |
 | `/repo/branches` | Branch management: list, create, switch, delete (local + remote), merge |
 | `/repo/tags` | Tag management: list, create, delete, search/filter |
 | `/repo/stash` | Stash management: save, apply, pop, drop, clear |
+
+All five repo pages include page descriptions.
 
 ## API Endpoints
 
@@ -44,6 +46,8 @@
 | `/api/git/browse` | GET | Filesystem directory browsing |
 | `/api/git/tags` | GET/POST/DELETE | Tag CRUD |
 | `/api/git/stash` | GET/POST/DELETE | Stash operations |
+| `/api/git/files` | GET | List files in repo |
+| `/api/git/files/content` | GET | Get file content |
 
 ### GitHub API (proxied via Octokit)
 
@@ -52,9 +56,14 @@
 | `/api/github/repos` | GET | List authenticated user's repos |
 | `/api/github/commits` | GET | Commits for a GitHub repo |
 | `/api/github/commits/[hash]` | GET | Single commit detail from GitHub |
-| `/api/github/branches` | GET | Branches for a GitHub repo |
+| `/api/github/branches` | GET/DELETE | Branches (list + delete) |
 | `/api/github/tags` | GET | Tags for a GitHub repo |
 | `/api/github/diff` | GET | Diff between two commits on GitHub |
+| `/api/github/files` | GET | List files in repo tree |
+| `/api/github/files/content` | GET | Get file content |
+| `/api/github/cherry-pick` | POST | Cherry-pick commits via GitHub API |
+| `/api/github/revert` | POST | Revert commits via GitHub API |
+| `/api/github/reset` | POST | Reset branch to commit via GitHub API |
 
 ### AI Chat API
 
@@ -80,7 +89,7 @@
 ## AI Chat Feature
 
 ### Overview
-A sliding panel chat assistant available on all `/repo/*` pages (local mode only). Users click a floating button to open it.
+A sidebar chat assistant available on all pages, including the home page without a repo selected. Users can reference repo entities via inline `@` mentions.
 
 ### Tech Stack
 - Vercel AI SDK 6 (`ai@6.x`, `@ai-sdk/openai`, `@ai-sdk/react`)
@@ -92,8 +101,9 @@ A sliding panel chat assistant available on all `/repo/*` pages (local mode only
 - **API Route** (`/api/chat`): POST handler using `streamText` with multi-step tool calling (up to 8 steps). Validates repo path, creates scoped git tools, streams response.
 - **Tools Layer** (`src/lib/ai/tools.ts`): Factory function `createGitTools(repoPath)` returns 12 tools wrapping existing git service functions.
 - **System Prompt** (`src/lib/ai/system-prompt.ts`): Dynamic prompt builder with repo context, tool descriptions, behavioral guidelines.
-- **Chat UI** (`src/components/chat/`): Sheet-based sliding panel with message list, markdown rendering, tool call indicators, auto-scroll, clear history.
-- **Chat Trigger** (`src/components/chat/chat-trigger.tsx`): Floating button with tooltip, placed in repo layout.
+- **Chat Sidebar** (`src/components/chat/chat-sidebar.tsx`): Fixed sidebar on desktop, slide-in overlay on mobile. Always shows input, even without a repo.
+- **Chat Input** (`src/components/chat/chat-input.tsx`): Controlled textarea with inline `@` mention parsing, keyboard forwarding, model selector.
+- **Mention Picker** (`src/components/chat/mention-picker.tsx`): Inline dropdown with category buttons and search results.
 
 ### AI Tools (12 total)
 
@@ -121,17 +131,14 @@ A sliding panel chat assistant available on all `/repo/*` pages (local mode only
 | `cherryPickCommits` | Cherry-pick commits | `cherryPickCommit()` |
 | `revertCommits` | Revert commits | `revertCommit()` |
 
-### Chat UI Features
-- Streaming responses with real-time token display
-- Tool call status indicators (running/complete/error) with per-tool icons
-- Markdown rendering with syntax-highlighted code blocks, tables, lists
-- Auto-resizing textarea with Enter to send, Shift+Enter for newline
-- Stop streaming button
-- Clear chat history
-- Empty state with suggested queries
-- "Powered by GPT-4o" badge
-- Local mode guard (disabled in GitHub mode)
-- Responsive design (full-width on mobile, 440px sheet on desktop)
+### Inline Mention System
+
+- Type `@` to open category picker (File, Commit, Branch, Tag, Stash, Repo)
+- Type `@file:pack` to search files matching "pack"
+- Type `@pack` for cross-category search
+- Single-click selects item, adds chip above textarea, removes `@...` text
+- Category shortcuts: `@file:`, `@commit:`, `@branch:`, `@tag:`, `@stash:`, `@repo:`
+- Stash hidden in GitHub mode
 
 ## File Structure
 
@@ -141,11 +148,12 @@ src/
     axios.ts              # Axios instance
     api-endpoints.ts      # Local git API endpoint URLs
     github-endpoints.ts   # GitHub API endpoint URLs
-    constants.ts          # Constants and enums
+    constants.ts          # Constants, enums, MENTION_CATEGORIES, MENTION_CATEGORY_SHORTCUTS
   services/
     frontend/
       git.services.ts     # API calls for local git operations
       github.services.ts  # API calls for GitHub operations
+      mention.services.ts # API calls for mention file listing/content
     server/               # (Reserved for future server-side services)
   hooks/
     use-git/
@@ -157,6 +165,12 @@ src/
     use-repo.ts           # Repo context (path, mode, owner, repoName)
     use-recent-repos.ts   # localStorage recent repos
     use-keyboard-shortcuts.ts  # Global keyboard navigation
+    use-mention-query/
+      index.ts            # Inline mention query parser (textarea text + cursor)
+    use-mention-candidates/
+      index.ts            # SWR fetcher for mention items (single + cross-category)
+    use-mentions/
+      index.ts            # Selected mentions state (add, remove, clear)
   schemas/
     git.ts                # Zod schemas for validation
   lib/
@@ -176,6 +190,9 @@ src/
       tags.ts             # getTags, createTag, deleteTag
     github/
       client.ts           # Octokit service for GitHub API
+    mentions/
+      types.ts            # MentionItem, MentionCategory, ResolvedMentionContext
+      resolve-context.ts  # Fetch full context for mentions on send
     auth.ts               # better-auth server config
     auth-client.ts        # better-auth React client
     auth-helpers.ts       # Server-side auth helpers
@@ -187,29 +204,31 @@ src/
     formatters.ts         # Shared formatting utilities (with isValid guards)
     utils.ts              # shadcn utility (cn)
   components/
-    ui/                   # shadcn components (button, badge, card, sheet, dialog, etc.)
+    ui/                   # shadcn components (button, badge, card, dialog, etc.)
+    ai-elements/          # PromptInput, ModelSelector components
     providers.tsx         # ThemeProvider, TooltipProvider, ModeProvider
     loaders/              # Loading skeletons (commit-list, branch-list)
     repo/                 # Repo selector, layout, header, path-input
-    commits/              # Commit list, detail
+    commits/              # Commit list, detail, list-item
     branches/             # Branch management
-    tags/                 # Tag management
-    stash/                # Stash management
+    tags/                 # Tag management, list-item
+    stash/                # Stash management, list-item
     diff/                 # Diff viewer, compare view
-    shared/               # Confirmation dialog, site-footer, mode-promo
+    shared/               # Confirmation dialog, site-footer, mode-promo, mode-switcher
     github/               # GitHub-specific components (repo-picker)
     chat/                 # AI Chat feature
-      chat-panel.tsx      # Sliding Sheet panel with useChat hook
-      chat-trigger.tsx    # Floating button to open chat
+      chat-sidebar.tsx    # Main container (desktop sidebar + mobile overlay)
+      chat-input.tsx      # Controlled textarea + inline mentions + model selector
       chat-message.tsx    # Message renderer with markdown + tool indicators
-      chat-input.tsx      # Auto-resizing textarea with send/stop
+      mention-picker.tsx  # Inline dropdown (categories + search)
+      mention-chips.tsx   # Selected mention badges
     icons/                # Custom icon components
   app/
     globals.css           # Tailwind v4 imports + custom theme + chat-markdown styles
     layout.tsx            # Root layout with providers
-    page.tsx              # Landing page (mode selector)
+    page.tsx              # Landing page (mode selector + chat sidebar)
     repo/
-      layout.tsx          # Repo layout with nav tabs + ChatTrigger
+      layout.tsx          # Repo layout with nav tabs + chat sidebar
       commits/
         page.tsx
         [hash]/page.tsx
@@ -221,7 +240,7 @@ src/
       auth/[...all]/route.ts  # better-auth handler
       chat/route.ts            # AI chat streaming endpoint
       git/                     # Local git API route handlers
-      github/                  # GitHub API route handlers
+      github/                  # GitHub API route handlers (11 routes)
 ```
 
 ## Database
@@ -242,57 +261,49 @@ src/
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth app secret |
 | `OPENAI_API_KEY` | OpenAI API key for AI chat (GPT-4o) |
 
-## Implementation Order
-
-1. Scaffold project, install deps, configure shadcn/ui
-2. Git backend library (`lib/git/`)
-3. Server response helpers and API routes
-4. Config files (axios, endpoints, constants)
-5. Services and hooks
-6. Layout and landing page
-7. Commits UI (list, search/filter, row actions, detail page)
-8. Diff UI (diff2html viewer, compare page)
-9. Branches UI (list, create/delete/merge, local + remote delete)
-10. Tags UI (list, create/delete)
-11. Stash UI (list, save/apply/pop/drop/clear)
-12. Auth + database setup (better-auth, Drizzle, Neon)
-13. GitHub mode (Octokit client, GitHub API routes, services, hooks)
-14. Unified hooks layer + mode switching UI
-15. Polish (loading states, error handling, toasts, keyboard shortcuts)
-16. **Responsive design** (mobile-first across all components)
-17. **AI Chat feature** (tools, system prompt, API route, chat UI panel)
-
 ## Current Status
 
 ### Completed
 - [x] Project scaffold + all dependencies installed
 - [x] Git backend library with full coverage (commits, branches, diff, status, tags, stash, operations)
-- [x] All local git API routes (15 endpoints)
-- [x] All GitHub API routes (6 endpoints)
+- [x] All local git API routes (16 endpoints)
+- [x] All GitHub API routes (11 endpoints) with standardized server-response helpers
 - [x] Auth system (better-auth + GitHub OAuth + Drizzle + Neon)
 - [x] Config layer (axios, endpoints, constants)
-- [x] Frontend services (git.services.ts, github.services.ts)
+- [x] Frontend services (git.services.ts, github.services.ts, mention.services.ts)
 - [x] SWR hooks (use-git, use-github, use-unified)
 - [x] Layout system (landing page, repo layout, header with nav tabs)
 - [x] Commits UI (paginated list, search, detail page)
-- [x] Diff UI (diff2html viewer, compare page)
+- [x] Diff UI (diff2html viewer, compare page, unified/split toggle with icons)
 - [x] Branches UI (list, create, switch, delete local/remote, merge)
 - [x] Tags UI (list, create, delete)
 - [x] Stash UI (list, save, apply, pop, drop, clear)
 - [x] Safety tiers with confirmation dialogs
 - [x] Site-wide responsive design (all components mobile-optimized)
-- [x] Site footer with hydration fix
+- [x] Page descriptions on all 5 repo pages
 - [x] Date formatting with isValid guards
+- [x] Keyboard shortcuts (1-5 for page navigation)
 - [x] AI Chat: Tools layer (12 tools wrapping git functions)
-- [x] AI Chat: System prompt builder
+- [x] AI Chat: System prompt builder (local + GitHub)
 - [x] AI Chat: Streaming API route with multi-step tool calling
-- [x] AI Chat: Chat panel UI (Sheet, messages, input, trigger)
-- [x] AI Chat: Integrated into repo layout
+- [x] AI Chat: Sidebar UI (desktop + mobile)
+- [x] AI Chat: Chat available without repo selected
+- [x] AI Chat: Inline `@` mention system with category shortcuts
+- [x] AI Chat: Cross-category search for bare `@` queries
+- [x] AI Chat: Mention chips above textarea
+- [x] GitHub mode: Branch deletion
+- [x] GitHub mode: Cherry-pick commits
+- [x] GitHub mode: Revert commits
+- [x] GitHub mode: Reset branch to commit
+- [x] GitHub mode: Async parallelization (5 functions optimized with Promise.all)
+- [x] GitHub mode: All API routes standardized with server-response.ts
+- [x] Commit selector truncation (truncateMiddle for long messages)
+- [x] Button asChild fix (React.Children.only crash)
+- [x] Diff line number overflow fix (CSS table-layout, min-width, padding)
 - [x] Build passes (`pnpm build` with zero errors)
 
 ### Pending / Future
 - [ ] Chat message persistence (save/restore chat history)
-- [ ] GitHub mode chat support (via Octokit tools)
 - [ ] Generative UI (render commit cards, diff blocks, branch badges inline in chat)
 - [ ] Token usage tracking and display per message
 - [ ] Write operation approval UI in chat (confirm before branch create, cherry-pick, etc.)
@@ -305,12 +316,16 @@ src/
 2. Enter a local git repo path, validates and opens
 3. View commit history with pagination and search
 4. Reset, cherry-pick, revert operations work with proper confirmations
-5. Diff view shows file changes between commits
+5. Diff view shows file changes between commits (unified + split toggle)
 6. Branch management (create, switch, delete local/remote, merge) works
 7. Tag management (create, delete, filter) works
 8. Stash management (save, apply, pop, drop, clear) works
-9. Sign in with GitHub, browse remote repos read-only
-10. AI chat opens via floating button, can query repo with natural language
-11. AI uses tools to fetch real data (commits, branches, diffs, files)
-12. All pages are responsive on mobile (320px+)
-13. `pnpm build` completes without errors
+9. Sign in with GitHub, browse and manage remote repos
+10. GitHub mode: branch deletion, cherry-pick, revert, reset work
+11. AI chat opens in sidebar, can query repo with natural language
+12. AI uses tools to fetch real data (commits, branches, diffs, files)
+13. Type `@file:` in chat to search files, select to add chip
+14. Type `@pack` for cross-category search
+15. Chat works on home page without repo selected
+16. All pages are responsive on mobile (320px+)
+17. `pnpm build` completes without errors

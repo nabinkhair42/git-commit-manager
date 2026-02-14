@@ -48,11 +48,11 @@ The AI Chat feature uses Vercel AI SDK 6 with a tool-calling architecture.
 
 ### Frontend (Chat UI)
 
-- `src/components/chat/chat-panel.tsx`: Main panel using `useChat` from `@ai-sdk/react` with `DefaultChatTransport`.
-- `src/components/chat/chat-trigger.tsx`: Floating button placed in `src/app/repo/layout.tsx`.
+- `src/components/chat/chat-sidebar.tsx`: Main sidebar using `useChat` from `@ai-sdk/react` with `DefaultChatTransport`. Always-visible on desktop, slide-in overlay on mobile. Chat is available even without a selected repo.
+- `src/components/chat/chat-input.tsx`: Controlled textarea via `PromptInputProvider`. Inline `@` mention parsing with `useMentionQuery` hook. Keyboard forwarding for picker navigation. Model selector dropdown.
 - `src/components/chat/chat-message.tsx`: Renders messages with `react-markdown`, shows tool call status with icons.
-- `src/components/chat/chat-input.tsx`: Auto-resizing textarea with send/stop buttons.
-- Chat panel is a Sheet (radix-ui) sliding from the right, `sm:max-w-[440px]`.
+- `src/components/chat/mention-picker.tsx`: Inline dropdown with two modes: category buttons (bare `@`) and search results (with category prefix or cross-category). Single-click select.
+- `src/components/chat/mention-chips.tsx`: Displays selected mentions as removable badge chips above the textarea.
 
 ### Adding New AI Tools
 
@@ -64,13 +64,26 @@ The AI Chat feature uses Vercel AI SDK 6 with a tool-calling architecture.
 
 ## Mention/Reference System
 
-The chat supports an `@` mention system that lets users reference repo entities (files, commits, branches, tags, stashes, repos) in chat messages.
+The chat supports an inline `@` mention system that lets users reference repo entities in chat messages. Typing `@` in the textarea triggers the picker inline -- no modal.
 
-### Trigger Mechanism
+### Inline Trigger
 
-- Typing `@` in the chat input (at start or after whitespace) opens a categorized picker
-- Clicking the `@` button in the toolbar also opens the picker
-- Users can select multiple items across categories; selected items appear as chips above the input
+- Typing `@` (at start or after whitespace) opens a category picker inline below the cursor
+- Continuing to type (e.g., `@file:pack`) auto-switches to the matching category and filters results
+- Bare `@pack` (no category prefix) searches across all categories
+- Clicking the `@` toolbar button inserts `@` at the cursor position
+- Single-click on an item selects it, adds a chip above the textarea, removes the `@...` text, and closes the picker
+
+### Category Shortcuts
+
+| Shortcut | Category |
+|----------|----------|
+| `@file:` | File |
+| `@commit:` | Commit |
+| `@branch:` | Branch |
+| `@tag:` | Tag |
+| `@stash:` | Stash |
+| `@repo:` | Repository |
 
 ### Categories and Data Sources
 
@@ -82,6 +95,10 @@ The chat supports an `@` mention system that lets users reference repo entities 
 | Tag | `gitService.getTags` | `githubService.getGitHubTags` |
 | Stash | `gitService.getStashList` | Hidden in GitHub mode |
 | Repository | `useRecentRepos` (localStorage) | `githubService.getGitHubRepos` |
+
+### Cross-Category Search
+
+When the user types `@pack` (no category prefix), the system fetches the top 10 results from each category in parallel via `Promise.allSettled` and displays them grouped by category.
 
 ### Context Resolution
 
@@ -98,6 +115,7 @@ The resolved context is appended to the user message as a `## User-Referenced Co
 |---------|------|
 | Types | `src/lib/mentions/types.ts` |
 | Constants | `src/config/constants.ts` (MENTION_* exports) |
+| Query parser hook | `src/hooks/use-mention-query/index.ts` |
 | Context resolution | `src/lib/mentions/resolve-context.ts` |
 | Frontend services | `src/services/frontend/mention.services.ts` |
 | Candidates hook | `src/hooks/use-mention-candidates/index.ts` |
@@ -111,9 +129,10 @@ The resolved context is appended to the user message as a `## User-Referenced Co
 
 1. Add the category to `MentionCategory` type in `src/lib/mentions/types.ts`
 2. Add entry to `MENTION_CATEGORIES` in `src/config/constants.ts`
-3. Add fetcher function in `src/hooks/use-mention-candidates/index.ts`
-4. Add resolver in `src/lib/mentions/resolve-context.ts`
-5. Add icon mapping in `mention-chips.tsx` and `mention-picker.tsx`
+3. Add shortcut to `MENTION_CATEGORY_SHORTCUTS` in `src/config/constants.ts`
+4. Add fetcher function in `src/hooks/use-mention-candidates/index.ts`
+5. Add resolver in `src/lib/mentions/resolve-context.ts`
+6. Add icon mapping in `mention-chips.tsx` and `mention-picker.tsx`
 
 ## Code Standards
 

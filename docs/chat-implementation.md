@@ -1,35 +1,36 @@
 # Chat Implementation Summary
 
 ## Overview
-We've implemented a clean, Cursor-inspired chat interface using Vercel AI SDK UI best practices and structural-grid design principles.
+AI-powered chat sidebar with inline `@` mention system. Uses Vercel AI SDK 6 with tool-calling architecture. Available on all pages, including without a selected repo.
 
 ## Architecture
 
-### Layout Structure (Cursor-style)
+### Layout Structure
 ```
-┌────────────────────────────────────────────┐
-│         Header (fixed)                     │
-├─────────────────────────┬──────────────────┤
-│   Main Content          │  Chat Sidebar    │
-│   (scrollable) ↕       │  (fixed)         │
-│   - Repo pages          │  - Input (top)   │
-│   - Footer              │  - Messages      │
-│                         │  - Footer        │
-└─────────────────────────┴──────────────────┘
++--------------------------------------------+
+|         Header (fixed)                     |
++-------------------------+------------------+
+|   Main Content          |  Chat Sidebar    |
+|   (scrollable)          |  (fixed)         |
+|   - Repo pages          |  - Top bar       |
+|   - Footer              |  - Messages      |
+|                         |  - Input (bottom) |
++-------------------------+------------------+
 ```
 
 **Key characteristics:**
-- **Desktop**: 3-column fixed layout, only main content scrolls
-- **Mobile**: Chat slides in as overlay
-- **Main content never shifts** - chat is part of the layout, not an overlay
+- **Desktop**: Fixed sidebar layout, only main content scrolls
+- **Mobile**: Chat slides in as overlay with backdrop
+- **Main content never shifts** -- chat is part of the layout, not an overlay
+- **Chat always available** -- works without a repo selected (use `@repo:` to reference repos)
 
 ## Components
 
 ### 1. `chat-sidebar.tsx` (Main Container)
 **Desktop behavior:**
-- Always visible as 440px fixed sidebar
+- Always visible as fixed sidebar
 - Full height from header to bottom
-- Doesn't scroll (only messages inside scroll)
+- Only messages inside scroll
 
 **Mobile behavior:**
 - Hidden by default
@@ -40,235 +41,143 @@ We've implemented a clean, Cursor-inspired chat interface using Vercel AI SDK UI
 ```tsx
 const { messages, sendMessage, status, stop, setMessages } = useChat({
   id: "repo-chat",
-  api: "/api/chat",
-  body: { repoPath },
+  transport,
 });
 ```
 
+**No-repo state:**
+- Chat input always rendered (not gated on repo selection)
+- Empty state shown only when no messages AND no repo selected
+- Hints user to use `@repo:` to reference repositories
+
 ### 2. `chat-input.tsx` (Input Component)
-**Design (Cursor-inspired):**
-- Input at top (not bottom)
-- Placeholder: "Ask questions about the repo"
-- Agent selector: `∞ Agent` with "Sonnet 4.5" dropdown
-- Circular send/stop button
-- Auto-resizing textarea (max 120px)
+**Architecture:**
+- Wrapped in `PromptInputProvider` for controlled textarea access
+- Inner component uses `usePromptInputController()` to read/write textarea value
+- `useMentionQuery()` hook parses text + cursor position for inline mentions
+- `useMentions()` hook manages selected mention chips
 
-**AI SDK patterns:**
-- Monitors status: `submitted` | `streaming` | `ready` | `error`
-- Sends via `sendMessage({ text })`
-- Shows stop button when `isStreaming`
-- Disables send when `status !== "ready"`
+**Inline Mention Flow:**
+1. User types `@` -- `parseMentionQuery` detects it, picker opens showing category buttons
+2. User clicks "File" -- text becomes `@file:`, picker switches to file search mode
+3. User types `pack` -- text is `@file:pack`, picker filters files containing "pack"
+4. User selects item -- `@file:pack` removed from text, chip added above textarea, picker closes
+5. Alternative: user types `@pack` (no category) -- cross-category search across all categories
 
-**Features:**
-- Enter to send, Shift+Enter for newline
-- Auto-focus on mount
-- Textarea auto-resizes with content
-- Clean, minimal borders
+**Keyboard Handling:**
+- `Escape`: Close picker, keep typed text
+- `Enter` (picker open): Prevent form submit, let cmdk handle item selection
+- `Enter` (picker closed): Submit message normally
 
-### 3. `chat-message.tsx` (Message Display)
-**Rendering (AI SDK best practice):**
+**`@` Toolbar Button:**
+- Inserts `@` at current cursor position
+- Triggers mention query parsing
+- Opens picker
+
+### 3. `mention-picker.tsx` (Inline Dropdown)
+**Two display modes:**
+
+1. **Categories mode** (`query.mode === "categories"`): Grid of category buttons (File, Commit, Branch, Tag, Stash, Repo). Stash hidden in GitHub mode. Clicking inserts the shortcut (e.g., `@file:`) into textarea.
+
+2. **Search mode** (`query.mode === "search"`): `CommandList` of items from `useMentionCandidates`. When category is null, results grouped by category headers. Single-click selects.
+
+**Key differences from previous picker:**
+- No `CommandInput` (search comes from textarea)
+- No checkboxes (single-click select)
+- No footer (no Add/Cancel buttons)
+- No tabs (category from typed prefix)
+- Click-outside closes picker
+
+### 4. `mention-chips.tsx` (Selected Mentions)
+- Displays selected mentions as badge chips above the textarea
+- Category icon + truncated label (30 chars max)
+- X button to remove individual mentions
+- Returns null if no mentions
+
+### 5. `chat-message.tsx` (Message Display)
+**Rendering:**
 - Uses `message.parts` (not `content`)
 - Supports text, tool calls, reasoning parts
 - Auto-scrolls to bottom on new messages
 
 **Features:**
 - User/AI avatars with role-based styling
-- Tool call indicators with icons (12 tools)
+- Tool call indicators with icons
 - Tool states: running, complete, error
 - Markdown rendering (ReactMarkdown)
 - Code syntax highlighting
 - "Thinking..." indicator when `status === "submitted"`
 - Empty state with suggested questions
 
-## AI SDK UI Compliance
+## Hooks
 
-### ✅ Best Practices Followed
+### `useMentionQuery`
+Parses textarea text + cursor position to extract active mention query.
 
-1. **useChat hook configuration:**
-   ```tsx
-   useChat({
-     id: "repo-chat",
-     api: "/api/chat",
-     body: { repoPath },
-   })
-   ```
+```typescript
+interface MentionQuery {
+  active: boolean;
+  raw: string;              // Full text from @ to cursor
+  category: MentionCategory | null;
+  search: string;           // Text after category prefix
+  startPos: number;         // Position of @ in textarea
+  mode: "categories" | "search";
+}
+```
 
-2. **Message rendering:**
-   - ✅ Using `message.parts` array
-   - ✅ Handling text, tool calls, reasoning parts
-   - ✅ Supporting streaming states
+**Parse logic:**
+1. Scan backwards from cursor to find `@` preceded by whitespace or at start
+2. If no `@` found: inactive
+3. If bare `@`: categories mode
+4. If `prefix:search` with known prefix: search mode with category
+5. Otherwise: search mode with cross-category search
 
-3. **Status management:**
-   - ✅ `submitted` → "Thinking..." indicator
-   - ✅ `streaming` → Stop button visible
-   - ✅ `ready` → Send button enabled
-   - ✅ `error` → Could add error display
+### `useMentionCandidates`
+SWR-based hook that fetches mention candidates.
+- When `category` is set: fetches from that category
+- When `category` is null + search non-empty: fetches top 10 from each category in parallel via `Promise.allSettled`
+- Deduping interval: 2000ms
 
-4. **Input handling:**
-   - ✅ `sendMessage({ text })` on submit
-   - ✅ Clear input after sending
-   - ✅ Disable when not ready
-
-5. **Stream control:**
-   - ✅ `stop()` aborts streaming
-   - ✅ `setMessages()` for clearing chat
-
-## Design System
-
-### Structural Grid Principles
-- ✅ Minimal borders (`border-border`)
-- ✅ Subtle backgrounds (`bg-transparent`, `hover:bg-white/5`)
-- ✅ Clean spacing and padding
-- ✅ No heavy shadows or gradients
-- ✅ Foreground/background contrast for active states
-
-### Cursor-Inspired Elements
-- Input at top (reversed from typical chat)
-- Agent/model selector integrated
-- Circular action buttons
-- Clean, uncluttered interface
-- Tokenizer/Context info in footer
+### `useMentions`
+State management for selected mentions.
+- `addMention(item)`: Add (deduplicates by id)
+- `removeMention(id)`: Remove by id
+- `clearMentions()`: Clear all
 
 ## File Structure
 
 ```
-src/
-├── app/
-│   └── repo/
-│       └── layout.tsx          # Fixed 3-column layout
-├── components/
-│   └── chat/
-│       ├── chat-sidebar.tsx    # Main container (desktop + mobile)
-│       ├── chat-input.tsx      # Input + agent selector
-│       ├── chat-message.tsx    # Message display + tools
-│       ├── chat-panel.tsx      # (Old overlay version)
-│       └── chat-trigger.tsx    # (Old floating trigger)
+src/components/chat/
+  chat-sidebar.tsx      # Main container (desktop + mobile)
+  chat-input.tsx        # Controlled textarea + inline mentions + model selector
+  chat-message.tsx      # Message display + tools
+  mention-picker.tsx    # Inline dropdown (categories + search)
+  mention-chips.tsx     # Selected mention badges
+
+src/hooks/
+  use-mention-query/index.ts      # Textarea mention parser
+  use-mention-candidates/index.ts # SWR fetcher for mention items
+  use-mentions/index.ts           # Selected mentions state
+
+src/lib/mentions/
+  types.ts              # MentionItem, MentionCategory, ResolvedMentionContext
+  resolve-context.ts    # Fetch full context for mentions on send
+
+src/config/constants.ts # MENTION_CATEGORIES, MENTION_CATEGORY_SHORTCUTS
 ```
 
-## Features
+## AI SDK Compliance
 
-### Current
-- [x] Fixed sidebar layout (desktop)
-- [x] Sliding overlay (mobile)
-- [x] Input at top with agent selector
-- [x] Auto-resizing textarea
-- [x] Send/Stop button states
-- [x] Message streaming
-- [x] Tool call indicators (12 tools)
-- [x] Thinking indicator
-- [x] Auto-scroll
-- [x] Empty state
-- [x] Markdown rendering
-- [x] Context/Tokenizer footer
-
-### Future Enhancements
-- [ ] Functional model selector dropdown
-- [ ] Multiple AI providers (Anthropic, Gemini, etc.)
-- [ ] Message persistence (localStorage/DB)
-- [ ] Token usage tracking (real-time)
-- [ ] Generative UI (inline cards, badges)
-- [ ] Voice input
-- [ ] File attachments
-- [ ] Chat history search
-- [ ] Export chat as markdown
-- [ ] Clear chat confirmation
+1. **useChat hook**: `id`, `transport` with `DefaultChatTransport`
+2. **Message rendering**: `message.parts` array with text, tool calls, reasoning
+3. **Status management**: `submitted` / `streaming` / `ready` / `error`
+4. **Input handling**: `sendMessage({ text })`, clear after send
+5. **Stream control**: `stop()` aborts, `setMessages()` for clearing
 
 ## Performance
 
-### Optimizations
-- Auto-scroll only on new messages (not every render)
-- Textarea height cached between renders
-- Tool icons lazy-loaded via dynamic imports
+- Auto-scroll only on new messages
+- SWR deduping for mention candidates (2000ms)
+- Cross-category search parallelized with Promise.allSettled
 - Scroll container isolated (only messages scroll)
-
-### Bundle Size
-- Using `react-markdown` (lightweight)
-- No heavy dependencies
-- Lucide icons tree-shakeable
-
-## Accessibility
-
-- [x] ARIA labels on buttons
-- [x] Keyboard navigation (Enter/Shift+Enter)
-- [x] Focus management (auto-focus input)
-- [x] Screen reader friendly status updates
-- [ ] TODO: Keyboard shortcuts for chat actions
-- [ ] TODO: High contrast mode support
-
-## Testing Checklist
-
-### Desktop
-- [ ] Chat sidebar always visible
-- [ ] Main content scrolls, sidebar doesn't
-- [ ] Input auto-focuses
-- [ ] Send button works
-- [ ] Stop button cancels streaming
-- [ ] Messages render with markdown
-- [ ] Tool calls show progress
-- [ ] Context footer displays
-
-### Mobile
-- [ ] Trigger button visible
-- [ ] Chat slides in on click
-- [ ] Backdrop closes chat
-- [ ] Close button works
-- [ ] Input still auto-resizes
-- [ ] Messages scrollable
-
-### Edge Cases
-- [ ] Long messages wrap correctly
-- [ ] Code blocks have horizontal scroll
-- [ ] Multiple tool calls in sequence
-- [ ] Error states display properly
-- [ ] Network errors handled gracefully
-
-## Code Quality
-
-### TypeScript
-- ✅ Strict type checking
-- ✅ Proper interface definitions
-- ✅ AI SDK types (`UIMessage`, etc.)
-
-### React Best Practices
-- ✅ Hooks usage (useState, useEffect, useRef)
-- ✅ Proper cleanup in useEffect
-- ✅ Key props on mapped items
-- ✅ Accessibility attributes
-
-### Tailwind CSS
-- ✅ Utility-first classes
-- ✅ Responsive breakpoints
-- ✅ Custom theme variables
-- ✅ Dark mode support
-
-## Comparison with Cursor Docs
-
-| Feature | Cursor | Our Implementation |
-|---------|--------|-------------------|
-| Input position | Top | ✅ Top |
-| Agent selector | Yes | ✅ Yes (static) |
-| Model dropdown | Yes | ✅ Yes (static) |
-| Send button style | Circular | ✅ Circular |
-| Layout behavior | Fixed sidebar | ✅ Fixed sidebar |
-| Scroll behavior | Only content | ✅ Only content |
-| Footer info | Tokenizer/Context | ✅ Tokenizer/Context |
-| Clean design | Minimal | ✅ Minimal |
-
-## Next Steps
-
-### Immediate
-1. Make model selector functional (switch between GPT-4o, Claude, etc.)
-2. Add real token usage tracking
-3. Test on actual repository
-
-### Short-term
-1. Add message persistence
-2. Implement chat history
-3. Add more AI providers
-4. Generative UI components
-
-### Long-term
-1. Voice input/output
-2. File attachments
-3. Advanced reasoning display
-4. Collaborative chat (multi-user)
+- Mention query parsed on every keystroke (lightweight string scan)

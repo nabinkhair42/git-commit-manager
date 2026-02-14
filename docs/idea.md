@@ -1,8 +1,8 @@
-# Git Commit Manager
+# GitPilot
 
 ## What It Is
 
-A web-based GUI for managing Git repositories. Works in two modes: **Local** (connects to repos on your machine via simple-git) and **GitHub** (reads repos from your GitHub account via Octokit). Runs as a Next.js app. Includes an AI-powered chat assistant for natural language repo exploration.
+An AI-powered visual Git client for managing repositories. Works in two modes: **Local** (connects to repos on your machine via simple-git) and **GitHub** (manages repos from your GitHub account via Octokit). Runs as a Next.js app. Includes an AI chat assistant with inline `@` mentions for natural language repo exploration.
 
 ## The Problem
 
@@ -20,31 +20,33 @@ These operations require remembering exact hashes, flags, and sequences. A singl
 
 A polished dark-mode web UI that wraps Git operations with:
 - Visual commit history with search and filtering
-- Side-by-side diff viewing for any two commits
+- Side-by-side diff viewing (unified or split) for any two commits
+- Cherry-pick, revert, and reset operations in both local and GitHub modes
 - Branch management with local and remote branch support (including remote branch deletion)
 - Tag management (lightweight and annotated)
 - Stash management (save, apply, pop, drop, clear)
 - Safety tiers with appropriate confirmation dialogs (typed confirmation for destructive operations)
 - Multi-repo support via URL parameters, bookmarkable views
-- GitHub mode for read-only browsing of remote repositories with OAuth
-- **AI Chat**: Natural language repo assistant powered by GPT-4o with multi-step tool calling
+- GitHub mode with full read/write operations via GitHub API
+- **AI Chat**: Natural language repo assistant with inline `@` mention system for referencing files, commits, branches, tags, stashes, and repositories
+- Chat works without a selected repo (use `@repo:` to reference any repository)
 - Fully responsive design across all screen sizes
 
 ## How It Works
 
 **Local mode**: Standalone Next.js app running on localhost. Enter a repo path (with autocomplete), and it connects using `simple-git`. No cloud, all state comes from Git. Recent repos stored in localStorage.
 
-**GitHub mode**: Sign in with GitHub OAuth. Browse your repositories, view commits, branches, tags, and diffs. Write operations are disabled (read-only). Auth managed by better-auth with Neon Postgres for session storage.
+**GitHub mode**: Sign in with GitHub OAuth. Browse and manage your repositories: view commits, branches, tags, diffs, and perform write operations (branch deletion, cherry-pick, revert, reset) via the GitHub API. Auth managed by better-auth with Neon Postgres for session storage. All 11 API routes use standardized server-response helpers with async parallelization for faster loading.
 
-**AI Chat mode**: In local mode, a sliding panel chat assistant can explore your repository autonomously. It uses 12 AI tools (10 read-only, 4 write) backed by the same git service layer. The AI chains up to 8 tool calls per response to answer complex questions like "Summarize what changed between v1.0 and v2.0".
+**AI Chat**: Available on all pages, even without a repo selected. An inline `@` mention system lets you reference repo entities (files, commits, branches, tags, stashes, repos) with category shortcuts like `@file:`, `@commit:`, `@branch:`. Cross-category search with bare `@` queries. The AI uses multi-step tool calling to chain operations and answer complex questions.
 
 Each repo is identified by path (local) or owner/name (GitHub) in the URL, so multiple repos can be open in different tabs.
 
 ## Tech Stack
 
-- Next.js 16.1.6 (App Router)
+- Next.js 16.x (App Router)
 - TypeScript
-- React 19.2.3
+- React 19.x
 - Tailwind CSS v4 (postcss plugin, no config file)
 - shadcn/ui components (radix-ui primitives)
 - simple-git (local Git operations)
