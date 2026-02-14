@@ -6,7 +6,12 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { ModeSwitcher } from "@/components/shared/mode-switcher";
 import { GitHubModeContent } from "@/components/repo/github-mode";
-import { LocalModeBottom, LocalModeContent } from "@/components/repo/local-mode";
+import {
+  LocalModeBottom,
+  LocalModeContent,
+} from "@/components/repo/local-mode";
+import { GitHub } from "../icons/github";
+import { FolderGit2 } from "lucide-react";
 
 const isProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
 
@@ -27,15 +32,25 @@ export function RepoSelector() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="page-rails flex flex-col">
+    <div className="flex flex-col">
       {/* Hero */}
       <section className="relative pt-16">
-        <div className="mx-auto w-full max-w-6xl px-4 text-center sm:px-6">
+        <div className="rail-bounded px-4 text-center sm:px-6">
+
           <div className="pb-8">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5">
-              <span className="size-1.5 animate-pulse rounded-full bg-foreground/40" />
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1">
               <span className="text-[13px] text-muted-foreground">
-                {mode === "github" ? "GitHub Explorer" : "Local Git Manager"}
+                {mode === "github" ? (
+                  <div className="inline-flex items-center gap-1">
+                    <GitHub className="size-3" />
+                    GitHub Mode
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1">
+                    <FolderGit2 className="size-3" />
+                    Local Mode
+                  </div>
+                )}
               </span>
             </div>
 

@@ -4,8 +4,8 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { RepoContext } from "@/hooks/use-repo";
 import { RepoHeader } from "@/components/repo/repo-header";
-import { SiteFooter } from "@/components/shared/site-footer";
 import { ChatSidebar } from "@/components/chat/chat-sidebar";
+import { SiteFooter } from "@/components/shared/site-footer";
 import type { AppMode } from "@/hooks/use-mode";
 
 function RepoLayoutInner({ children }: { children: React.ReactNode }) {
@@ -20,16 +20,11 @@ function RepoLayoutInner({ children }: { children: React.ReactNode }) {
     <RepoContext.Provider
       value={{ repoPath, mode, githubOwner, githubRepoName }}
     >
-      <div className="flex h-screen overflow-clip">
-        {/* Content column: header + scrollable main */}
-        <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 overflow-clip">
+        <div className="flex min-w-0 flex-1 flex-col page-rails">
           <RepoHeader />
-          <main className="flex min-h-0 flex-1 flex-col">
-            <div className="page-rails flex min-h-0 flex-1 flex-col">
-              {children}
-            </div>
-            <SiteFooter />
-          </main>
+          <>{children}</>
+          <SiteFooter />
         </div>
         <ChatSidebar />
       </div>

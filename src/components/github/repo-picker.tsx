@@ -115,11 +115,18 @@ export function GitHubRepoPicker() {
         ) : (
           <div className="divide-y divide-border">
             {filtered.map((repo) => (
-              <button
+              <div
                 key={repo.fullName}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => selectRepo(repo)}
-                className="group flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-muted"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    selectRepo(repo);
+                  }
+                }}
+                className="group flex w-full cursor-pointer items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -163,7 +170,7 @@ export function GitHubRepoPicker() {
                 >
                   Open <ArrowRight className="ml-1 h-3 w-3" />
                 </Button>
-              </button>
+              </div>
             ))}
           </div>
         )}

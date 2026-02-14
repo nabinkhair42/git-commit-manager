@@ -18,7 +18,7 @@ import {
   Tag,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { GitManagerAppIcon } from "../icons/git-manager";
 
 const localNavItems = [
@@ -59,7 +59,6 @@ const githubNavItems = [
 
 export function RepoHeader() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { mode, repoPath, githubOwner, githubRepoName } = useRepo();
   const isGitHub = mode === "github";
 
@@ -86,8 +85,8 @@ export function RepoHeader() {
     : (repoPath || "").split("/").pop() || repoPath || "";
 
   return (
-    <header className="shrink-0 border-b border-border bg-background">
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-2 px-4 sm:gap-3 sm:px-6">
+    <header className="border-b border-border bg-background">
+      <div className="flex h-14 rail-bounded items-center justify-between gap-2 px-4 sm:gap-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Link
             href={isGitHub ? "/?mode=github" : "/"}

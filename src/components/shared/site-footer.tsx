@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Monitor } from "lucide-react";
-import { GitManagerAppIcon } from "../icons/git-manager";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { GitManagerAppIcon } from "../icons/git-manager";
 
 const themes = [
   { value: "light", icon: Sun, label: "Light" },
@@ -22,8 +22,7 @@ export function SiteFooter() {
 
   return (
     <footer className="shrink-0 border-t border-border">
-      <div className="mx-auto flex h-10 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-
+      <div className="flex h-10 rail-bounded items-center justify-between gap-4 px-4 sm:px-6">
         {/* Left — branding */}
         <Link
           href="/"

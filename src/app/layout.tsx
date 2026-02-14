@@ -1,5 +1,5 @@
 import { Providers } from "@/components/providers";
-import { SiteFooter } from "@/components/shared/site-footer";
+
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
@@ -91,11 +91,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${plusJakarta.variable} ${ibmPlexMono.variable} font-sans antialiased`}
+        className={`${plusJakarta.variable} ${ibmPlexMono.variable} flex h-screen flex-col overflow-hidden font-sans antialiased`}
       >
         <Providers>
           {children}
-          <SiteFooter />
         </Providers>
       </body>
     </html>

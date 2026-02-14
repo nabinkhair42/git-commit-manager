@@ -139,7 +139,7 @@
 
 /* Structural Grid - Rail Lines */
 .page-rails {
-  --rail-offset: max(1rem, calc(50% - 36rem));
+  --rail-offset: max(1rem, calc(50% - 30rem));
   position: relative;
   overflow-x: clip;
 }

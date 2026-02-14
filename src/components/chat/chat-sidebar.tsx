@@ -132,20 +132,6 @@ export function ChatSidebar() {
             status={status}
           />
         )}
-
-        {/* Footer */}
-        <div className="flex h-10 shrink-0 items-center border-t border-border px-4">
-          <div className="flex w-full items-center justify-between text-[11px] text-muted-foreground">
-            <span>Tokenizer: Off</span>
-            <div className="flex items-center gap-1">
-              <span>Context:</span>
-              <span className="tabular-nums">
-                {contextUsed.toLocaleString()}/{(contextTotal / 1000).toLocaleString()}k
-              </span>
-              <span className="text-muted-foreground/60">({contextPercentage}%)</span>
-            </div>
-          </div>
-        </div>
       </aside>
     </>
   );

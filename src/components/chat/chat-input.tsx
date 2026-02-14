@@ -26,8 +26,16 @@ import { useState } from "react";
 
 const MODELS = [
   { id: "gpt-4o", name: "GPT-4o", provider: "openai" as const },
-  { id: "claude-sonnet-4-5-20250929", name: "Claude Sonnet 4.5", provider: "anthropic" as const },
-  { id: "claude-opus-4-6", name: "Claude Opus 4.6", provider: "anthropic" as const },
+  {
+    id: "claude-sonnet-4-5-20250929",
+    name: "Claude Sonnet 4.5",
+    provider: "anthropic" as const,
+  },
+  {
+    id: "claude-opus-4-6",
+    name: "Claude Opus 4.6",
+    provider: "anthropic" as const,
+  },
   { id: "grok-3", name: "Grok 3", provider: "xai" as const },
 ];
 
@@ -38,14 +46,19 @@ interface ChatInputProps {
   disabled?: boolean;
 }
 
-export function ChatInput({ onSend, onStop, status, disabled }: ChatInputProps) {
+export function ChatInput({
+  onSend,
+  onStop,
+  status,
+  disabled,
+}: ChatInputProps) {
   const [selectedModel, setSelectedModel] = useState(MODELS[0].id);
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
 
   const currentModel = MODELS.find((m) => m.id === selectedModel) ?? MODELS[0];
 
   return (
-    <div className="shrink-0 border-t border-border">
+    <div className="shrink-0">
       <PromptInput
         onSubmit={(message) => {
           if (message.text.trim()) {
@@ -70,7 +83,10 @@ export function ChatInput({ onSend, onStop, status, disabled }: ChatInputProps) 
               Agent
             </Button>
 
-            <ModelSelector open={modelSelectorOpen} onOpenChange={setModelSelectorOpen}>
+            <ModelSelector
+              open={modelSelectorOpen}
+              onOpenChange={setModelSelectorOpen}
+            >
               <ModelSelectorTrigger asChild>
                 <Button
                   variant="ghost"

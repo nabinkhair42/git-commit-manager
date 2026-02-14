@@ -23,7 +23,7 @@ export function PageLayout({
           className={cn(
             "py-4",
             actions &&
-              "flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+              "flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
           )}
         >
           <div>
@@ -37,7 +37,7 @@ export function PageLayout({
         {filters}
       </div>
       {/* Scrollable content */}
-      <div className="min-h-0">{children}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
     </div>
   );
 }
