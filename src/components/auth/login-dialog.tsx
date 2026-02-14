@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { GitHub } from "@/components/icons/github";
 import { GitManagerAppIcon } from "@/components/icons/git-manager";
-import { signIn, useSession } from "@/lib/auth-client";
+import { signIn, useSession } from "@/lib/auth/auth-client";
 import { useState } from "react";
 
 export function LoginDialog() {

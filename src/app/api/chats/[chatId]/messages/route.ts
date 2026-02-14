@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { chat, chatMessage } from "@/lib/db/schema";
-import { getAuthSession } from "@/lib/auth-helpers";
+import { getAuthSession } from "@/lib/auth/auth-helpers";
 import { successResponse, errorResponse } from "@/lib/response/server-response";
 import { eq, and } from "drizzle-orm";
 import type { UIMessage } from "ai";
@@ -36,7 +36,12 @@ export async function POST(
             parts: m.parts,
           }))
         )
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: chatMessage.id,
+          set: {
+            parts: chatMessage.parts,
+          },
+        });
 
       // Bump updatedAt
       await db

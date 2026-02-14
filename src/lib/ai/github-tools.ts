@@ -422,5 +422,30 @@ export function createGeneralTools(token: string) {
         };
       },
     }),
+
+    selectRepository: tool({
+      description:
+        "Select a repository to work with. Call this when the user wants to explore a specific repo (e.g. 'select web-sense', 'use that repo', 'open nabinkhair42/pest-js'). After calling this, the next message will have full repo tools (branches, commits, files, etc.).",
+      inputSchema: z.object({
+        owner: z.string().describe("Repository owner (e.g. 'nabinkhair42')."),
+        repo: z.string().describe("Repository name (e.g. 'web-sense')."),
+      }),
+      execute: async ({ owner, repo }) => {
+        try {
+          const info = await getRepoInfo(token, owner, repo);
+          return {
+            success: true,
+            message: `Repository ${owner}/${repo} selected. You now have full access to explore its branches, commits, files, and more.`,
+            defaultBranch: info.currentBranch,
+            headCommit: info.headCommit,
+          };
+        } catch {
+          return {
+            success: false,
+            message: `Repository ${owner}/${repo} not found or not accessible.`,
+          };
+        }
+      },
+    }),
   };
 }

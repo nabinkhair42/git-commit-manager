@@ -54,6 +54,7 @@ const modelLogo = (provider: string) =>
   `https://models.dev/logos/${provider}.svg`;
 
 export const AI_MODELS = [
+  { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", provider: "google", logo: modelLogo("google") },
   { id: "gpt-4o", name: "GPT-4o", provider: "openai", logo: modelLogo("openai") },
   { id: "claude-sonnet-4-5-20250929", name: "Claude Sonnet 4.5", provider: "anthropic", logo: modelLogo("anthropic") },
   { id: "claude-opus-4-6", name: "Claude Opus 4.6", provider: "anthropic", logo: modelLogo("anthropic") },

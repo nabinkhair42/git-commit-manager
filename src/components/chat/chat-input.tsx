@@ -36,7 +36,7 @@ import {
 } from "react";
 
 interface ChatInputProps {
-  onSend: (text: string, mentions: MentionItem[]) => void;
+  onSend: (text: string, mentions: MentionItem[], model: string) => void;
   onStop: () => void;
   status: ChatStatus;
   disabled?: boolean;
@@ -299,7 +299,7 @@ function ChatInputInner({ onSend, onStop, status, disabled }: ChatInputProps) {
       <PromptInput
         onSubmit={(message) => {
           if (message.text.trim() || mentions.length > 0) {
-            onSend(message.text.trim(), mentions);
+            onSend(message.text.trim(), mentions, selectedModel);
             clearMentions();
             clearQuery();
           }

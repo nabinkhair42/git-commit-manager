@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { chat, chatMessage } from "@/lib/db/schema";
-import { getAuthSession } from "@/lib/auth-helpers";
+import { getAuthSession } from "@/lib/auth/auth-helpers";
 import { successResponse, errorResponse } from "@/lib/response/server-response";
 import { eq, and, asc } from "drizzle-orm";
 

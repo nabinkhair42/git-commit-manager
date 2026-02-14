@@ -52,8 +52,8 @@ export async function saveMessages(id: string, messages: UIMessage[]) {
   );
 }
 
-export async function generateChatTitle(id: string, firstMessage: string) {
+export async function generateChatTitle(id: string, firstMessage: string, model?: string) {
   return unwrap<{ title: string }>(
-    await api.post(`/chats/${id}/generate-title`, { firstMessage })
+    await api.post(`/chats/${id}/generate-title`, { firstMessage, model })
   );
 }

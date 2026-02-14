@@ -1,7 +1,7 @@
 "use client";
 
 import { Suggestion } from "@/components/ai-elements/suggestion";
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth/auth-client";
 
 const SUGGESTIONS = [
   "Summarize recent commits",

@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { chat } from "@/lib/db/schema";
 import { generateId } from "@/lib/id";
-import { getAuthSession } from "@/lib/auth-helpers";
+import { getAuthSession } from "@/lib/auth/auth-helpers";
 import { successResponse, errorResponse } from "@/lib/response/server-response";
 import { desc, eq } from "drizzle-orm";
 
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const session = await getAuthSession();
     if (!session) return errorResponse("Not authenticated", 401);
 
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const id = generateId();
 
     const [created] = await db

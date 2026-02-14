@@ -56,6 +56,7 @@ function ChatAppInner({
   const { githubOwner, githubRepoName } = useRepo();
   const { mutate: mutateChatHistory } = useChatHistory();
   const router = useRouter();
+  const modelRef = useRef("gpt-4o");
 
   const createdChatIdRef = useRef<string | null>(activeChatId);
   const prevStatusRef = useRef<string>("ready");
@@ -64,10 +65,11 @@ function ChatAppInner({
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: {
+        body: () => ({
           owner: githubOwner,
           repo: githubRepoName,
-        },
+          model: modelRef.current,
+        }),
       }),
     [githubOwner, githubRepoName],
   );
@@ -81,14 +83,14 @@ function ChatAppInner({
         lastAssistantMessageIsCompleteWithApprovalResponses,
     });
 
-  // Save messages when AI response completes (streaming -> ready)
+  // Save messages when AI response completes (any non-ready → ready)
   // Also sync Next.js router state after streaming completes for new chats
   useEffect(() => {
-    const wasStreaming = prevStatusRef.current === "streaming";
+    const prevStatus = prevStatusRef.current;
     prevStatusRef.current = status;
 
     if (
-      wasStreaming &&
+      prevStatus !== "ready" &&
       status === "ready" &&
       createdChatIdRef.current &&
       messages.length > 0
@@ -106,8 +108,11 @@ function ChatAppInner({
   }, [status, messages, mutateChatHistory, activeChatId, router]);
 
   const handleSend = useCallback(
-    async (text: string, mentions: MentionItem[]) => {
+    async (text: string, mentions: MentionItem[], model: string) => {
       if (!text.trim() && mentions.length === 0) return;
+
+      // Update model ref — read by transport body function at send time
+      modelRef.current = model;
 
       let messageText = text;
 
@@ -131,7 +136,7 @@ function ChatAppInner({
 
           // Generate title in background
           chatService
-            .generateChatTitle(newChat.id, messageText)
+            .generateChatTitle(newChat.id, messageText, model)
             .then(() => {
               mutateChatHistory();
             })
@@ -148,7 +153,7 @@ function ChatAppInner({
 
   const handleSuggestionClick = useCallback(
     (suggestion: string) => {
-      handleSend(suggestion, []);
+      handleSend(suggestion, [], modelRef.current);
     },
     [handleSend],
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { type UIMessage, isToolUIPart, getToolName } from "ai";
 import {
   Message,
@@ -51,12 +52,26 @@ interface ChatMessagesProps {
 }
 
 export function ChatMessages({
-  messages,
+  messages: rawMessages,
   status,
   onSuggestionClick,
   onAction,
   addToolApprovalResponse,
 }: ChatMessagesProps) {
+  // Deduplicate messages by ID — useChat can produce duplicates when
+  // initialMessages overlap with streamed messages. Keep the last occurrence.
+  const messages = useMemo(() => {
+    const seen = new Set<string>();
+    const deduped: UIMessage[] = [];
+    for (let i = rawMessages.length - 1; i >= 0; i--) {
+      if (!seen.has(rawMessages[i].id)) {
+        seen.add(rawMessages[i].id);
+        deduped.push(rawMessages[i]);
+      }
+    }
+    return deduped.reverse();
+  }, [rawMessages]);
+
   if (messages.length === 0) {
     return (
       <ConversationEmptyState>
@@ -112,7 +127,7 @@ export function ChatMessages({
                   const isDynamic = part.type === "dynamic-tool";
 
                   return (
-                    <Tool key={part.toolCallId}>
+                    <Tool key={`${part.toolCallId}-${index}`}>
                       <ToolHeader
                         title={label}
                         state={part.state}
@@ -195,7 +210,7 @@ export function ChatMessages({
             <MessageContent>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Spinner className="size-4" />
-                <span>Thinking...</span>
+                <span>Thinking</span>
               </div>
             </MessageContent>
           </Message>

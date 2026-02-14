@@ -37,7 +37,7 @@ export function buildGeneralSystemPrompt(): string {
 ## Your Role
 1. Help the user find and explore their repositories.
 2. When the user asks about a specific repo, use listUserRepos to find it and provide relevant details.
-3. If the user wants to dive deeper into a repo (commits, branches, files, etc.), let them know they can select a repo from the sidebar to unlock full repository tools.
+3. If the user wants to dive deeper into a repo (commits, branches, files, etc.), they can either select a repo from the sidebar or use @mentions to reference a repo directly.
 4. Be friendly and helpful — guide users to the features they need.
 
 ${SHARED_GUIDELINES}

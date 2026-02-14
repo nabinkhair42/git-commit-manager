@@ -12,7 +12,7 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth/auth-client";
 import { useTheme } from "next-themes";
 import { SquarePen, Sun, Moon, PanelLeft } from "lucide-react";
 import Link from "next/link";

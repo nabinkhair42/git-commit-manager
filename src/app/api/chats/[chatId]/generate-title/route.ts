@@ -1,8 +1,8 @@
 import { generateText } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { getModelInstance, getCheapModel } from "@/lib/ai/models";
 import { db } from "@/lib/db";
 import { chat } from "@/lib/db/schema";
-import { getAuthSession } from "@/lib/auth-helpers";
+import { getAuthSession } from "@/lib/auth/auth-helpers";
 import { successResponse, errorResponse } from "@/lib/response/server-response";
 import { eq, and } from "drizzle-orm";
 
@@ -15,10 +15,10 @@ export async function POST(
     if (!session) return errorResponse("Not authenticated", 401);
 
     const { chatId } = await params;
-    const { firstMessage }: { firstMessage: string } = await req.json();
+    const { firstMessage, model }: { firstMessage: string; model?: string } = await req.json();
 
     const { text: title } = await generateText({
-      model: openai("gpt-4o-mini"),
+      model: model ? getModelInstance(model) : getCheapModel(),
       system:
         "Generate a concise chat title (max 50 chars) for a conversation about GitHub repositories. Return ONLY the title, no quotes or punctuation wrapping.",
       prompt: firstMessage,
