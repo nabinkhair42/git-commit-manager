@@ -34,6 +34,7 @@ const TOOL_LABELS: Record<string, string> = {
   listTags: "List Tags",
   getFileContent: "File Content",
   listFiles: "File Tree",
+  listUserRepos: "List Repositories",
   createBranch: "Create Branch",
   deleteBranch: "Delete Branch",
   cherryPickCommits: "Cherry Pick",

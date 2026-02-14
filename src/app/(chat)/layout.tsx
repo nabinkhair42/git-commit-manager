@@ -15,7 +15,7 @@ export default async function ChatLayout({
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset className="h-svh min-h-0">{children}</SidebarInset>
     </SidebarProvider>
   );
 }
