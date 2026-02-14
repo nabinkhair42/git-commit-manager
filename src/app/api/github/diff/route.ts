@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getGitHubToken } from "@/lib/auth-helpers";
 import { getCompare } from "@/lib/github/client";
+import { successResponse, errorResponse } from "@/lib/response/server-response";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,17 +13,14 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get("to");
 
     if (!owner || !repo || !from || !to) {
-      return NextResponse.json(
-        { success: false, error: "owner, repo, from, and to are required" },
-        { status: 400 }
-      );
+      return errorResponse("owner, repo, from, and to are required", 400);
     }
 
     const data = await getCompare(token, owner, repo, from, to);
-    return NextResponse.json({ success: true, data });
+    return successResponse(data);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to fetch diff";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return errorResponse(message);
   }
 }

@@ -13,13 +13,36 @@ export function useMentionCandidates(category: MentionCategory | null, search: s
   const { mode, repoPath, githubOwner, githubRepoName } = useRepo();
   const { repos: recentRepos } = useRecentRepos();
 
-  const key = category
-    ? ["mention-candidates", category, mode, repoPath, githubOwner, githubRepoName, search]
+  // Allow fetching when: specific category selected, OR cross-category search with non-empty query
+  const shouldFetch = category !== null || search.length > 0;
+
+  const key = shouldFetch
+    ? ["mention-candidates", category ?? "all", mode, repoPath, githubOwner, githubRepoName, search]
     : null;
 
   const { data, isLoading, error } = useSWR<MentionItem[]>(
     key,
     async () => {
+      // Cross-category search: fetch from all categories in parallel
+      if (category === null && search) {
+        const limit = 10;
+        const fetchers: Promise<MentionItem[]>[] = [
+          fetchFiles(mode, repoPath, githubOwner, githubRepoName, search).then((r) => r.slice(0, limit)),
+          fetchCommits(mode, repoPath, githubOwner, githubRepoName, search).then((r) => r.slice(0, limit)),
+          fetchBranches(mode, repoPath, githubOwner, githubRepoName, search).then((r) => r.slice(0, limit)),
+          fetchTags(mode, repoPath, githubOwner, githubRepoName, search).then((r) => r.slice(0, limit)),
+          fetchRepositories(mode, recentRepos, githubOwner, githubRepoName, search).then((r) => r.slice(0, limit)),
+        ];
+        // Include stashes only in local mode
+        if (mode === "local") {
+          fetchers.push(
+            fetchStashes(mode, repoPath, search).then((r) => r.slice(0, limit))
+          );
+        }
+        const results = await Promise.allSettled(fetchers);
+        return results.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
+      }
+
       if (!category) return [];
 
       switch (category) {

@@ -115,6 +115,41 @@ export async function getGitHubDiff(
   );
 }
 
+// ─── Operations ─────────────────────────────────────────────────────────────
+
+export async function cherryPickGitHubCommit(
+  owner: string,
+  repo: string,
+  branch: string,
+  hash: string
+) {
+  return unwrap<{ success: boolean; message: string }>(
+    await api.post(GITHUB_API_ENDPOINTS.CHERRY_PICK, { owner, repo, branch, hash })
+  );
+}
+
+export async function revertGitHubCommit(
+  owner: string,
+  repo: string,
+  branch: string,
+  hash: string
+) {
+  return unwrap<{ success: boolean; message: string }>(
+    await api.post(GITHUB_API_ENDPOINTS.REVERT, { owner, repo, branch, hash })
+  );
+}
+
+export async function resetGitHubBranch(
+  owner: string,
+  repo: string,
+  branch: string,
+  hash: string
+) {
+  return unwrap<{ success: boolean; message: string }>(
+    await api.post(GITHUB_API_ENDPOINTS.RESET, { owner, repo, branch, hash })
+  );
+}
+
 // ─── Status (stub) ──────────────────────────────────────────────────────────
 
 export async function getGitHubStatus(

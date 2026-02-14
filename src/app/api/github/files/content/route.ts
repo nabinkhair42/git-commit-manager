@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getGitHubToken } from "@/lib/auth-helpers";
 import { createGitHubClient } from "@/lib/github/client";
 import { MENTION_FILE_CONTENT_MAX_CHARS } from "@/config/constants";
+import { successResponse, errorResponse } from "@/lib/response/server-response";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,10 +13,7 @@ export async function GET(request: NextRequest) {
     const filePath = searchParams.get("filePath");
 
     if (!owner || !repo || !filePath) {
-      return NextResponse.json(
-        { success: false, error: "owner, repo, and filePath are required" },
-        { status: 400 }
-      );
+      return errorResponse("owner, repo, and filePath are required", 400);
     }
 
     const ref = searchParams.get("ref") || undefined;
@@ -29,27 +27,21 @@ export async function GET(request: NextRequest) {
     });
 
     if (Array.isArray(data) || data.type !== "file") {
-      return NextResponse.json(
-        { success: false, error: "Path is not a file" },
-        { status: 400 }
-      );
+      return errorResponse("Path is not a file", 400);
     }
 
     const raw = Buffer.from(data.content, "base64").toString("utf-8");
     const content = raw.slice(0, MENTION_FILE_CONTENT_MAX_CHARS);
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        filePath,
-        ref: ref || "default",
-        content,
-        length: raw.length,
-        truncated: raw.length > MENTION_FILE_CONTENT_MAX_CHARS,
-      },
+    return successResponse({
+      filePath,
+      ref: ref || "default",
+      content,
+      length: raw.length,
+      truncated: raw.length > MENTION_FILE_CONTENT_MAX_CHARS,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to read file";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return errorResponse(message);
   }
 }

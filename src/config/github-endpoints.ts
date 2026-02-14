@@ -5,6 +5,9 @@ export const GITHUB_API_ENDPOINTS = {
   BRANCHES: "/github/branches",
   TAGS: "/github/tags",
   DIFF: "/github/diff",
+  CHERRY_PICK: "/github/cherry-pick",
+  REVERT: "/github/revert",
+  RESET: "/github/reset",
 
   // Files (for mention system)
   FILES: "/github/files",

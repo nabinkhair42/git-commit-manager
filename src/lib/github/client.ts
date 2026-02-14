@@ -88,25 +88,19 @@ export async function getCommitDetail(
   hash: string
 ) {
   const octokit = createGitHubClient(token);
-  const { data } = await octokit.rest.repos.getCommit({
-    owner,
-    repo,
-    ref: hash,
-  });
 
-  const commit = data;
-  const stats = commit.stats || { total: 0, additions: 0, deletions: 0 };
-
-  // Get the diff as text
-  const diffResponse = await octokit.request(
-    "GET /repos/{owner}/{repo}/commits/{ref}",
-    {
+  // async-parallel: both requests use the same hash and are independent
+  const [{ data: commit }, diffResponse] = await Promise.all([
+    octokit.rest.repos.getCommit({ owner, repo, ref: hash }),
+    octokit.request("GET /repos/{owner}/{repo}/commits/{ref}", {
       owner,
       repo,
       ref: hash,
       headers: { accept: "application/vnd.github.diff" },
-    }
-  );
+    }),
+  ]);
+
+  const stats = commit.stats || { total: 0, additions: 0, deletions: 0 };
 
   return {
     hash: commit.sha,
@@ -143,15 +137,13 @@ export async function getBranches(
   repo: string
 ) {
   const octokit = createGitHubClient(token);
-  const { data } = await octokit.rest.repos.listBranches({
-    owner,
-    repo,
-    per_page: 100,
-  });
 
-  // Get the default branch to mark it as current
-  const repoData = await octokit.rest.repos.get({ owner, repo });
-  const defaultBranch = repoData.data.default_branch;
+  // async-parallel: branch list and repo info are independent
+  const [{ data }, { data: repoData }] = await Promise.all([
+    octokit.rest.repos.listBranches({ owner, repo, per_page: 100 }),
+    octokit.rest.repos.get({ owner, repo }),
+  ]);
+  const defaultBranch = repoData.default_branch;
 
   return data.map((branch) => ({
     name: branch.name,
@@ -176,6 +168,195 @@ export async function deleteBranch(
     ref: `heads/${branch}`,
   });
   return { success: true, message: `Branch "${branch}" deleted` };
+}
+
+export async function resetBranch(
+  token: string,
+  owner: string,
+  repo: string,
+  branch: string,
+  sha: string
+) {
+  const octokit = createGitHubClient(token);
+  await octokit.rest.git.updateRef({
+    owner,
+    repo,
+    ref: `heads/${branch}`,
+    sha,
+    force: true,
+  });
+  return { success: true, message: `Branch "${branch}" reset to ${sha.substring(0, 7)}` };
+}
+
+export async function cherryPickCommit(
+  token: string,
+  owner: string,
+  repo: string,
+  branch: string,
+  commitSha: string
+) {
+  const octokit = createGitHubClient(token);
+
+  // async-parallel: ref lookup and commit detail are independent
+  const [ref, commitDetail] = await Promise.all([
+    octokit.rest.git.getRef({ owner, repo, ref: `heads/${branch}` }),
+    octokit.rest.repos.getCommit({ owner, repo, ref: commitSha }),
+  ]);
+  const headSha = ref.data.object.sha;
+  const headCommit = await octokit.rest.git.getCommit({ owner, repo, commit_sha: headSha });
+
+  const files = commitDetail.data.files || [];
+  const message = commitDetail.data.commit.message;
+
+  if (files.length === 0) {
+    throw new Error("No file changes found in the commit");
+  }
+
+  // Build tree entries from the cherry-picked commit's file changes
+  const treeEntries: Array<{
+    path: string;
+    mode: "100644";
+    type: "blob";
+    sha: string | null;
+  }> = [];
+
+  for (const file of files) {
+    if (file.status === "removed") {
+      treeEntries.push({ path: file.filename, mode: "100644", type: "blob", sha: null });
+    } else if (file.status === "renamed" && file.previous_filename) {
+      treeEntries.push({ path: file.previous_filename, mode: "100644", type: "blob", sha: null });
+      treeEntries.push({ path: file.filename, mode: "100644", type: "blob", sha: file.sha! });
+    } else {
+      treeEntries.push({ path: file.filename, mode: "100644", type: "blob", sha: file.sha! });
+    }
+  }
+
+  // Create new tree based on HEAD's tree with cherry-picked changes
+  const newTree = await octokit.rest.git.createTree({
+    owner,
+    repo,
+    base_tree: headCommit.data.tree.sha,
+    tree: treeEntries,
+  });
+
+  // Create the cherry-pick commit
+  const newCommit = await octokit.rest.git.createCommit({
+    owner,
+    repo,
+    message,
+    tree: newTree.data.sha,
+    parents: [headSha],
+  });
+
+  // Update the branch reference
+  await octokit.rest.git.updateRef({
+    owner,
+    repo,
+    ref: `heads/${branch}`,
+    sha: newCommit.data.sha,
+  });
+
+  return { success: true, message: `Cherry-picked ${commitSha.substring(0, 7)} onto "${branch}"` };
+}
+
+export async function revertCommit(
+  token: string,
+  owner: string,
+  repo: string,
+  branch: string,
+  commitSha: string
+) {
+  const octokit = createGitHubClient(token);
+
+  // async-parallel: ref lookup and commit detail are independent
+  const [ref, commitDetail] = await Promise.all([
+    octokit.rest.git.getRef({ owner, repo, ref: `heads/${branch}` }),
+    octokit.rest.repos.getCommit({ owner, repo, ref: commitSha }),
+  ]);
+  const headSha = ref.data.object.sha;
+  const headCommit = await octokit.rest.git.getCommit({ owner, repo, commit_sha: headSha });
+
+  const files = commitDetail.data.files || [];
+  const message = commitDetail.data.commit.message.split("\n")[0];
+  const parentSha = commitDetail.data.parents[0]?.sha;
+
+  if (!parentSha) {
+    throw new Error("Cannot revert the initial commit");
+  }
+
+  if (files.length === 0) {
+    throw new Error("No file changes found in the commit");
+  }
+
+  // Build tree entries that reverse the changes
+  const treeEntries: Array<{
+    path: string;
+    mode: "100644";
+    type: "blob";
+    sha: string | null;
+  }> = [];
+
+  // Collect parent file lookups for parallel execution (async-parallel)
+  const parentLookups: Array<{ lookupPath: string }> = [];
+
+  for (const file of files) {
+    if (file.status === "added") {
+      treeEntries.push({ path: file.filename, mode: "100644", type: "blob", sha: null });
+    } else if (file.status === "renamed" && file.previous_filename) {
+      treeEntries.push({ path: file.filename, mode: "100644", type: "blob", sha: null });
+      parentLookups.push({ lookupPath: file.previous_filename });
+    } else {
+      parentLookups.push({ lookupPath: file.filename });
+    }
+  }
+
+  // async-parallel: batch all parent file lookups instead of sequential awaits
+  const lookupResults = await Promise.all(
+    parentLookups.map(async ({ lookupPath }) => {
+      try {
+        const parentFile = await octokit.rest.repos.getContent({
+          owner, repo, path: lookupPath, ref: parentSha,
+        });
+        if (!Array.isArray(parentFile.data) && parentFile.data.type === "file") {
+          return { path: lookupPath, sha: parentFile.data.sha };
+        }
+      } catch { /* file may not exist in parent */ }
+      return null;
+    })
+  );
+
+  for (const result of lookupResults) {
+    if (result) {
+      treeEntries.push({ path: result.path, mode: "100644", type: "blob", sha: result.sha });
+    }
+  }
+
+  // Create new tree with reverted changes
+  const newTree = await octokit.rest.git.createTree({
+    owner,
+    repo,
+    base_tree: headCommit.data.tree.sha,
+    tree: treeEntries,
+  });
+
+  // Create the revert commit
+  const newCommit = await octokit.rest.git.createCommit({
+    owner,
+    repo,
+    message: `Revert "${message}"`,
+    tree: newTree.data.sha,
+    parents: [headSha],
+  });
+
+  // Update the branch reference
+  await octokit.rest.git.updateRef({
+    owner,
+    repo,
+    ref: `heads/${branch}`,
+    sha: newCommit.data.sha,
+  });
+
+  return { success: true, message: `Reverted ${commitSha.substring(0, 7)} on "${branch}"` };
 }
 
 // ─── Tags ───────────────────────────────────────────────────────────────────

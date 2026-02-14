@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getGitHubToken } from "@/lib/auth-helpers";
 import { getTags } from "@/lib/github/client";
+import { successResponse, errorResponse } from "@/lib/response/server-response";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,17 +11,14 @@ export async function GET(request: NextRequest) {
     const repo = searchParams.get("repo");
 
     if (!owner || !repo) {
-      return NextResponse.json(
-        { success: false, error: "owner and repo are required" },
-        { status: 400 }
-      );
+      return errorResponse("owner and repo are required", 400);
     }
 
     const data = await getTags(token, owner, repo);
-    return NextResponse.json({ success: true, data });
+    return successResponse(data);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to fetch tags";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return errorResponse(message);
   }
 }

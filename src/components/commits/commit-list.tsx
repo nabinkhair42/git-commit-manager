@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { DEFAULT_COMMITS_PER_PAGE, RESET_MODES } from "@/config/constants";
 import { useGitMutations } from "@/hooks/use-git";
+import { useGitHubMutations } from "@/hooks/use-github";
 import { useRepo } from "@/hooks/use-repo";
 import { useUnifiedBranches, useUnifiedCommits } from "@/hooks/use-unified";
 import { formatHash } from "@/lib/formatters";
@@ -46,6 +47,11 @@ export function CommitList() {
 
   const { data: branchData } = useUnifiedBranches();
   const mutations = useGitMutations();
+  const ghMutations = useGitHubMutations();
+
+  // Resolve the target branch for GitHub operations
+  const defaultBranch = branchData?.branches.find((b) => b.current)?.name;
+  const targetBranch = branch || defaultBranch || "main";
 
   // Confirmation dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -106,35 +112,52 @@ export function CommitList() {
 
     showConfirm({
       title: `${config.label} Reset`,
-      description: `${config.description}. This will reset HEAD to ${formatHash(hash)}.${
-        isCritical
-          ? " This action is irreversible and will discard all uncommitted changes."
-          : ""
-      }`,
-      confirmLabel: `Reset (${mode})`,
+      description: isGitHub
+        ? `This will force-update "${targetBranch}" to ${formatHash(hash)}. All commits after this point will be lost. This action is irreversible.`
+        : `${config.description}. This will reset HEAD to ${formatHash(hash)}.${isCritical ? " This action is irreversible and will discard all uncommitted changes." : ""}`,
+      confirmLabel: isGitHub ? "Reset (hard)" : `Reset (${mode})`,
       variant: "destructive",
-      typedConfirmation: isCritical ? formatHash(hash) : undefined,
-      action: () => executeWithToast(() => mutations.reset(hash, mode)),
+      typedConfirmation: isGitHub || isCritical ? formatHash(hash) : undefined,
+      action: () =>
+        executeWithToast(() =>
+          isGitHub
+            ? ghMutations.reset(hash, targetBranch)
+            : mutations.reset(hash, mode)
+        ),
     });
   }
 
   function handleCherryPick(hash: string) {
     showConfirm({
       title: "Cherry-pick Commit",
-      description: `Apply commit ${formatHash(hash)} onto the current branch.`,
+      description: isGitHub
+        ? `Apply commit ${formatHash(hash)} onto the "${targetBranch}" branch.`
+        : `Apply commit ${formatHash(hash)} onto the current branch.`,
       confirmLabel: "Cherry-pick",
       variant: "default",
-      action: () => executeWithToast(() => mutations.cherryPick([hash])),
+      action: () =>
+        executeWithToast(() =>
+          isGitHub
+            ? ghMutations.cherryPick([hash], targetBranch)
+            : mutations.cherryPick([hash])
+        ),
     });
   }
 
   function handleRevert(hash: string) {
     showConfirm({
       title: "Revert Commit",
-      description: `Create a new commit that undoes the changes from ${formatHash(hash)}.`,
+      description: isGitHub
+        ? `Create a new commit on "${targetBranch}" that undoes the changes from ${formatHash(hash)}.`
+        : `Create a new commit that undoes the changes from ${formatHash(hash)}.`,
       confirmLabel: "Revert",
       variant: "default",
-      action: () => executeWithToast(() => mutations.revert([hash])),
+      action: () =>
+        executeWithToast(() =>
+          isGitHub
+            ? ghMutations.revert([hash], targetBranch)
+            : mutations.revert([hash])
+        ),
     });
   }
 

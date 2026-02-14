@@ -124,46 +124,54 @@ export function CommitListItem({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          {!isGitHub && (
-            <>
-              <DropdownMenuItem onClick={onCherryPick}>
-                <CherryIcon size={14} className="mr-2" />
-                Cherry-pick
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onRevert}>
-                <Undo2 size={14} className="mr-2" />
-                Revert
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <RotateCcw size={14} className="mr-2" />
-                  Reset to here
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  {(Object.keys(RESET_MODES) as ResetMode[]).map(
-                    (resetMode) => (
-                      <DropdownMenuItem
-                        key={resetMode}
-                        onClick={() => onReset?.(resetMode)}
-                        className={
-                          resetMode === "hard"
-                            ? "text-destructive focus:text-destructive"
-                            : ""
-                        }
-                      >
-                        {RESET_MODES[resetMode].label}
-                        <span className="ml-auto text-[10px] text-muted-foreground">
-                          {RESET_MODES[resetMode].description}
-                        </span>
-                      </DropdownMenuItem>
-                    ),
-                  )}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuSeparator />
-            </>
-          )}
+          <DropdownMenuItem onClick={onCherryPick}>
+            <CherryIcon size={14} className="mr-2" />
+            Cherry-pick
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onRevert}>
+            <Undo2 size={14} className="mr-2" />
+            Revert
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <RotateCcw size={14} className="mr-2" />
+              Reset to here
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              {isGitHub ? (
+                <DropdownMenuItem
+                  onClick={() => onReset?.("hard")}
+                  className="text-destructive focus:text-destructive"
+                >
+                  {RESET_MODES.hard.label}
+                  <span className="ml-auto text-[10px] text-muted-foreground">
+                    {RESET_MODES.hard.description}
+                  </span>
+                </DropdownMenuItem>
+              ) : (
+                (Object.keys(RESET_MODES) as ResetMode[]).map(
+                  (resetMode) => (
+                    <DropdownMenuItem
+                      key={resetMode}
+                      onClick={() => onReset?.(resetMode)}
+                      className={
+                        resetMode === "hard"
+                          ? "text-destructive focus:text-destructive"
+                          : ""
+                      }
+                    >
+                      {RESET_MODES[resetMode].label}
+                      <span className="ml-auto text-[10px] text-muted-foreground">
+                        {RESET_MODES[resetMode].description}
+                      </span>
+                    </DropdownMenuItem>
+                  ),
+                )
+              )}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
               navigator.clipboard.writeText(hash);

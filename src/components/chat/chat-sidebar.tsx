@@ -13,7 +13,7 @@ import { useMemo, useState } from "react";
 
 export function ChatSidebar() {
   const { repoPath, mode, githubOwner, githubRepoName } = useRepo();
-  const isChatEnabled =
+  const hasRepo =
     (mode === "local" && !!repoPath) ||
     (mode === "github" && !!githubOwner && !!githubRepoName);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -135,13 +135,13 @@ export function ChatSidebar() {
 
         {/* Messages (Conversation handles scroll via use-stick-to-bottom) */}
         <div className="min-h-0 flex-1">
-          {!isChatEnabled ? (
+          {messages.length === 0 && !hasRepo ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
               <Bot className="size-10 text-muted-foreground/40" />
               <div className="space-y-1">
                 <p className="text-sm font-medium">No Repository Selected</p>
                 <p className="text-xs text-muted-foreground">
-                  Select a repository to start chatting.
+                  Use <kbd className="rounded border border-border px-1 py-0.5 font-mono text-[10px]">@repo:</kbd> to reference a repository, or select one first.
                 </p>
               </div>
             </div>
@@ -155,13 +155,11 @@ export function ChatSidebar() {
         </div>
 
         {/* Input (Bottom) */}
-        {isChatEnabled && (
-          <ChatInput
-            onSend={handleSend}
-            onStop={stop}
-            status={status}
-          />
-        )}
+        <ChatInput
+          onSend={handleSend}
+          onStop={stop}
+          status={status}
+        />
       </aside>
     </>
   );

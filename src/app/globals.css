@@ -213,14 +213,15 @@
   color: var(--muted-foreground) !important;
   border-color: var(--border) !important;
   background: transparent !important;
-  min-width: 2.5em !important;
+  min-width: 3.5em !important;
   width: auto !important;
   white-space: nowrap !important;
   overflow: visible !important;
   text-overflow: unset !important;
   box-sizing: content-box !important;
-  padding-left: 0.5em !important;
-  padding-right: 0.5em !important;
+  padding-left: 0.75em !important;
+  padding-right: 0.75em !important;
+  text-align: right !important;
 }
 .d2h-info {
   background: color-mix(in srgb, var(--foreground) 3%, transparent) !important;
@@ -315,18 +316,26 @@
 
 /* Side-by-side line number sizing */
 .d2h-code-side-linenumber {
-  min-width: 2.5em !important;
+  min-width: 3.5em !important;
   width: auto !important;
   white-space: nowrap !important;
   overflow: visible !important;
+  text-overflow: unset !important;
   box-sizing: content-box !important;
-  padding-left: 0.5em !important;
-  padding-right: 0.5em !important;
+  padding-left: 0.75em !important;
+  padding-right: 0.75em !important;
+  text-align: right !important;
 }
 
-/* Table borders */
+/* Let diff2html side-by-side panes scroll internally */
+.d2h-file-side-diff {
+  overflow-x: auto !important;
+}
+
+/* Table layout — auto lets line-number cells honour min-width */
 .d2h-diff-table {
   border-collapse: collapse !important;
+  table-layout: auto !important;
 }
 .d2h-diff-tbody tr td {
   border-color: var(--border) !important;

@@ -35,9 +35,20 @@ export const FILE_STATUS_LABELS: Record<string, string> = {
 
 // ─── Mentions ──────────────────────────────────────────────────────────────
 
+import type { MentionCategory } from "@/lib/mentions/types";
+
 export const MENTION_TRIGGER_CHAR = "@";
 export const MENTION_FILE_CONTENT_MAX_CHARS = 6000;
 export const MENTION_MAX_ITEMS_PER_CATEGORY = 50;
+
+export const MENTION_CATEGORY_SHORTCUTS: Record<string, MentionCategory> = {
+  file: "file",
+  commit: "commit",
+  branch: "branch",
+  tag: "tag",
+  stash: "stash",
+  repo: "repository",
+};
 
 export const MENTION_CATEGORIES = [
   { id: "file" as const, label: "File", icon: "FileText", placeholder: "Search files..." },

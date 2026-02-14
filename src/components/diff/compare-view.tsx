@@ -110,7 +110,7 @@ export function CompareView() {
         ) : diffLoading ? (
           <DiffSkeleton />
         ) : diffData ? (
-          <div className="overflow-x-auto px-6 py-6">
+          <div className="px-6 py-6">
             <DiffViewer diff={diffData.diff} outputFormat={viewFormat} />
           </div>
         ) : null}
