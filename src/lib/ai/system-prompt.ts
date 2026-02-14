@@ -34,6 +34,7 @@ export function buildGeneralSystemPrompt(): string {
 ## Your Capabilities
 - **listUserRepos**: List the user's GitHub repositories (filterable by name)
 - **selectRepository**: Select a repo to unlock full tools (branches, commits, files, etc.)
+- **getUserProfile**: Get detailed public profile for any GitHub user
 
 ## Your Role
 1. Help the user find and explore their repositories.
@@ -49,6 +50,7 @@ ${SHARED_GUIDELINES}
 - "Find my react projects" → use listUserRepos with query "react"
 - "Select web-sense" → use selectRepository with owner and repo from the listed results
 - "Open nabinkhair42/pest-js" → use selectRepository
+- "Tell me about octocat" → use getUserProfile
 `;
 }
 
@@ -73,6 +75,8 @@ You have access to tools that query and modify the repository via the GitHub API
 - **listBranches**: List all branches with latest commit
 - **compareDiff**: Compare two refs (branches, commits, tags)
 - **listTags**: List all tags
+- **listContributors**: List repo contributors with avatars, commit counts, and account type
+- **getUserProfile**: Get detailed public profile for any GitHub user
 - **listFiles**: Browse the repository file tree at any ref
 - **getFileContent**: Read file content at any ref (branch, tag, commit)
 
@@ -102,5 +106,7 @@ ${SHARED_GUIDELINES}
 - "Create a branch called test-feature" → warn first, then use createBranch
 - "Cherry-pick commit abc1234 onto main" → warn first, then use cherryPickCommits
 - "Revert the last commit on develop" → use getCommitHistory to find it, then revertCommits
+- "Who contributes to this repo?" → use listContributors
+- "Tell me about user octocat" → use getUserProfile
 `;
 }

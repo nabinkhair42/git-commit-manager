@@ -16,6 +16,8 @@ import {
   cherryPickCommit,
   revertCommit,
   resetBranch,
+  getContributors,
+  getUserProfile,
 } from "@/lib/github/client";
 
 /**
@@ -379,6 +381,46 @@ export function createGitHubTools(
         }
       },
     }),
+
+    listContributors: tool({
+      description:
+        "List contributors to this repository with their avatar, commit count, and account type. Use this when the user asks who contributes to the repo.",
+      inputSchema: z.object({
+        maxCount: z
+          .number()
+          .optional()
+          .default(30)
+          .describe("Maximum number of contributors to return (default 30, max 100)."),
+      }),
+      execute: async ({ maxCount }) => {
+        const contributors = await getContributors(token, owner, repo, {
+          maxCount: Math.min(maxCount ?? 30, 100),
+        });
+        return {
+          count: contributors.length,
+          contributors,
+        };
+      },
+    }),
+
+    getUserProfile: tool({
+      description:
+        "Get the public GitHub profile for a user by username. Returns bio, stats, company, location, and links. Use this when the user asks about a specific GitHub user.",
+      inputSchema: z.object({
+        username: z
+          .string()
+          .describe("The GitHub username to look up."),
+      }),
+      execute: async ({ username }) => {
+        try {
+          return await getUserProfile(token, username);
+        } catch (error) {
+          return {
+            error: `Failed to fetch profile for "${username}": ${error instanceof Error ? error.message : "Unknown error"}`,
+          };
+        }
+      },
+    }),
   };
 }
 
@@ -443,6 +485,25 @@ export function createGeneralTools(token: string) {
           return {
             success: false,
             message: `Repository ${owner}/${repo} not found or not accessible.`,
+          };
+        }
+      },
+    }),
+
+    getUserProfile: tool({
+      description:
+        "Get the public GitHub profile for a user by username. Returns bio, stats, company, location, and links. Use this when the user asks about a specific GitHub user.",
+      inputSchema: z.object({
+        username: z
+          .string()
+          .describe("The GitHub username to look up."),
+      }),
+      execute: async ({ username }) => {
+        try {
+          return await getUserProfile(token, username);
+        } catch (error) {
+          return {
+            error: `Failed to fetch profile for "${username}": ${error instanceof Error ? error.message : "Unknown error"}`,
           };
         }
       },

@@ -42,6 +42,8 @@ const TOOL_LABELS: Record<string, string> = {
   cherryPickCommits: "Cherry Pick",
   revertCommits: "Revert Commits",
   resetBranch: "Reset Branch",
+  listContributors: "Contributors",
+  getUserProfile: "User Profile",
 };
 
 interface ChatMessagesProps {

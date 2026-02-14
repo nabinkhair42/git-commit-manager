@@ -414,6 +414,56 @@ export async function getTags(
   }));
 }
 
+// ─── Contributors ────────────────────────────────────────────────────────────
+
+export async function getContributors(
+  token: string,
+  owner: string,
+  repo: string,
+  options: { maxCount?: number } = {}
+) {
+  const octokit = createGitHubClient(token);
+  const perPage = Math.min(options.maxCount || 30, 100);
+  const { data } = await octokit.rest.repos.listContributors({
+    owner,
+    repo,
+    per_page: perPage,
+  });
+
+  return (data || []).map((contributor) => ({
+    username: contributor.login || "Unknown",
+    avatarUrl: contributor.avatar_url || "",
+    contributions: contributor.contributions,
+    type: contributor.type || "User",
+    profileUrl: contributor.html_url || `https://github.com/${contributor.login || "ghost"}`,
+  }));
+}
+
+// ─── User Profiles ───────────────────────────────────────────────────────────
+
+export async function getUserProfile(token: string, username: string) {
+  const octokit = createGitHubClient(token);
+  const { data } = await octokit.rest.users.getByUsername({ username });
+
+  return {
+    username: data.login,
+    name: data.name || null,
+    avatarUrl: data.avatar_url,
+    bio: data.bio || null,
+    company: data.company || null,
+    location: data.location || null,
+    blog: data.blog || null,
+    twitterUsername: data.twitter_username || null,
+    publicRepos: data.public_repos,
+    publicGists: data.public_gists,
+    followers: data.followers,
+    following: data.following,
+    createdAt: data.created_at,
+    profileUrl: data.html_url,
+    type: data.type,
+  };
+}
+
 // ─── Diff ───────────────────────────────────────────────────────────────────
 
 export async function getCompare(

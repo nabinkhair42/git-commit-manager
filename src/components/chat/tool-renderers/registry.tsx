@@ -8,6 +8,8 @@ import { CompareDiffRenderer } from "./compare-diff-renderer";
 import { FileListRenderer } from "./file-list-renderer";
 import { FileContentRenderer } from "./file-content-renderer";
 import { WriteResultRenderer } from "./write-result-renderer";
+import { ContributorListRenderer } from "./contributor-list-renderer";
+import { UserProfileRenderer } from "./user-profile-renderer";
 
 export interface ToolRendererProps {
   output: unknown;
@@ -31,4 +33,6 @@ export const toolRenderers: Record<string, ToolRenderer> = {
   cherryPickCommits: WriteResultRenderer,
   revertCommits: WriteResultRenderer,
   resetBranch: WriteResultRenderer,
+  listContributors: ContributorListRenderer,
+  getUserProfile: UserProfileRenderer,
 };
