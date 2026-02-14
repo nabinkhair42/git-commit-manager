@@ -12,9 +12,9 @@ export const ModeSwitcher = () => {
       <button
         type="button"
         onClick={() => setMode("local")}
-        className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-md text-xs font-medium transition-all sm:gap-2 sm:text-sm ${
+        className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-md text-xs font-medium transition-[background-color,color,border-color,box-shadow] duration-200 sm:gap-2 sm:text-sm ${
           mode === "local"
-            ? "bg-background text-foreground  border"
+            ? "bg-background text-foreground border shadow-sm"
             : "text-muted-foreground hover:text-foreground"
         }`}
       >
@@ -24,9 +24,9 @@ export const ModeSwitcher = () => {
       <button
         type="button"
         onClick={() => setMode("github")}
-        className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-md text-xs font-medium transition-all sm:gap-2 sm:text-sm ${
+        className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-md text-xs font-medium transition-[background-color,color,border-color,box-shadow] duration-200 sm:gap-2 sm:text-sm ${
           mode === "github"
-            ? "bg-background text-foreground  border"
+            ? "bg-background text-foreground border shadow-sm"
             : "text-muted-foreground hover:text-foreground"
         }`}
       >

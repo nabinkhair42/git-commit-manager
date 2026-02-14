@@ -1,4 +1,3 @@
-
 import { PathInput } from "@/components/repo/path-input";
 import { Button } from "@/components/ui/button";
 import { useRecentRepos } from "@/hooks/use-recent-repos";
@@ -74,11 +73,9 @@ export function RecentRepos({
   if (repos.length === 0) return null;
 
   return (
-    <div className="rail-bounded">
+    <div className="rail-bounded border-t">
       <div className="px-4 pb-4 pt-8 sm:px-6">
-        <p className="font-medium text-muted-foreground">
-          Recent Repositories
-        </p>
+        <p className="font-medium text-muted-foreground">Recent Repositories</p>
       </div>
       <div className="grid gap-0 sm:grid-cols-2 border-y border-border">
         {repos.map((repo, i) => (
